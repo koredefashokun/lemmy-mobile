@@ -7,14 +7,18 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { retryWhen, delay, take } from "rxjs/operators";
-import { WebSocketJsonResponse, LoginResponse } from "../interfaces";
+import {
+  WebSocketJsonResponse,
+  LoginResponse,
+  UserOperation,
+} from "../interfaces";
 import { wsJsonToRes } from "../utils";
 import { i18n } from "../i18next";
 import authStyles from "../styles/auth";
-import { ServiceContext } from "../contexts/ServiceContext";
 import { AuthContext } from "../contexts/AuthContext";
 import { colors } from "../styles/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useWebSocketService from "../hooks/useWebSocketService";
 
 const initialState = {
   username_or_email: undefined,
@@ -27,8 +31,8 @@ const Login: React.FC = () => {
     initialState
   );
   const [loading, setLoading] = React.useState(false);
-  const { service } = React.useContext(ServiceContext);
-  const { setJwt } = React.useContext(AuthContext);
+  const service = useWebSocketService();
+  const { setJwt, loading: jLoading } = React.useContext(AuthContext);
 
   const parseMessage = (msg: WebSocketJsonResponse) => {
     let res = wsJsonToRes(msg);
@@ -37,29 +41,27 @@ const Login: React.FC = () => {
       setState(initialState);
       return;
     } else {
-      let data = res.data as LoginResponse;
-      setState(initialState);
-      setJwt(data.jwt);
-      service?.userJoin();
-      // toast(i18n.t('logged_in'));
-      // props.history.push('/');
+      if (res.op === UserOperation.Login) {
+        let data = res.data as LoginResponse;
+        setState(initialState);
+        setJwt(data.jwt);
+        service?.userJoin();
+        // toast(i18n.t('logged_in'));
+        // props.history.push('/');
+      }
     }
   };
 
   React.useEffect(() => {
-    console.log("Rendering...");
+    if (jLoading) return;
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(
-        parseMessage,
-        (err) => console.error(err),
-        () => console.log("complete")
-      );
+      .subscribe(parseMessage, console.error, () => console.log("complete"));
 
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [jLoading]);
 
   const handleLoginSubmit = () => {
     setLoading(true);
@@ -78,6 +80,9 @@ const Login: React.FC = () => {
           placeholderTextColor={colors.gray}
           keyboardType="email-address"
           autoCapitalize="none"
+          onChangeText={(usernameOrEmail) =>
+            setState({ username_or_email: usernameOrEmail })
+          }
         />
       </View>
       <View style={authStyles.inputContainer}>
@@ -87,6 +92,7 @@ const Login: React.FC = () => {
           placeholder="password"
           secureTextEntry
           placeholderTextColor={colors.gray}
+          onChangeText={(password) => setState({ password })}
         />
       </View>
       <TouchableOpacity

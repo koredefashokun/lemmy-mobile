@@ -1,4 +1,5 @@
 import React from "react";
+import { AppLoading } from "expo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -7,9 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import Login from "./src/screens/Login";
 import Register from "./src/screens/Register";
 
-import { AuthContext, AuthProvider } from "./src/contexts/AuthContext";
-import { ServiceContext } from "./src/contexts/ServiceContext";
-import { WebSocketService } from "./src/services";
+import { AuthProvider } from "./src/contexts/AuthContext";
 
 const AppStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -24,15 +23,10 @@ const AuthNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const { jwt } = React.useContext(AuthContext);
-  const service = React.useMemo(() => new WebSocketService(jwt), [jwt]);
-
   return (
-    <ServiceContext.Provider value={{ service }}>
-      <AppStack.Navigator headerMode="none">
-        <AppStack.Screen name="Auth" component={AuthNavigator} />
-      </AppStack.Navigator>
-    </ServiceContext.Provider>
+    <AppStack.Navigator headerMode="none">
+      <AppStack.Screen name="Auth" component={AuthNavigator} />
+    </AppStack.Navigator>
   );
 };
 

@@ -1,27 +1,27 @@
-import 'moment/locale/es';
-import 'moment/locale/el';
-import 'moment/locale/eu';
-import 'moment/locale/eo';
-import 'moment/locale/de';
-import 'moment/locale/zh-cn';
-import 'moment/locale/fr';
-import 'moment/locale/sv';
-import 'moment/locale/ru';
-import 'moment/locale/nl';
-import 'moment/locale/it';
-import 'moment/locale/fi';
-import 'moment/locale/ca';
-import 'moment/locale/fa';
-import 'moment/locale/pl';
-import 'moment/locale/pt-br';
-import 'moment/locale/ja';
-import 'moment/locale/ka';
-import 'moment/locale/hi';
-import 'moment/locale/gl';
-import 'moment/locale/tr';
-import 'moment/locale/hu';
-import 'moment/locale/uk';
-import 'moment/locale/sq';
+import "moment/locale/es";
+import "moment/locale/el";
+import "moment/locale/eu";
+import "moment/locale/eo";
+import "moment/locale/de";
+import "moment/locale/zh-cn";
+import "moment/locale/fr";
+import "moment/locale/sv";
+import "moment/locale/ru";
+import "moment/locale/nl";
+import "moment/locale/it";
+import "moment/locale/fi";
+import "moment/locale/ca";
+import "moment/locale/fa";
+import "moment/locale/pl";
+import "moment/locale/pt-br";
+import "moment/locale/ja";
+import "moment/locale/ka";
+import "moment/locale/hi";
+import "moment/locale/gl";
+import "moment/locale/tr";
+import "moment/locale/hu";
+import "moment/locale/uk";
+import "moment/locale/sq";
 
 import {
   UserOperation,
@@ -41,8 +41,8 @@ import {
   // SearchResponse,
   CommentResponse,
   PostResponse,
-} from './interfaces';
-import { UserService } from './services';
+} from "./interfaces";
+// import { UserService } from './services';
 
 // import Tribute from 'tributejs/src/Tribute.js';
 // import markdown_it from 'markdown-it';
@@ -51,62 +51,62 @@ import { UserService } from './services';
 // import twemoji from 'twemoji';
 // import emojiShortName from 'emoji-short-name';
 
-export const repoUrl = 'https://github.com/LemmyNet/lemmy';
-export const helpGuideUrl = '/docs/about_guide.html';
+export const repoUrl = "https://github.com/LemmyNet/lemmy";
+export const helpGuideUrl = "/docs/about_guide.html";
 export const markdownHelpUrl = `${helpGuideUrl}#markdown-guide`;
 export const sortingHelpUrl = `${helpGuideUrl}#sorting`;
-export const archiveUrl = 'https://archive.is';
+export const archiveUrl = "https://archive.is";
 
 export const postRefetchSeconds: number = 60 * 1000;
 export const fetchLimit: number = 20;
 export const mentionDropdownFetchLimit = 10;
 
 export const languages = [
-  { code: 'ca', name: 'Català' },
-  { code: 'en', name: 'English' },
-  { code: 'el', name: 'Ελληνικά' },
-  { code: 'eu', name: 'Euskara' },
-  { code: 'eo', name: 'Esperanto' },
-  { code: 'es', name: 'Español' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'gl', name: 'Galego' },
-  { code: 'hu', name: 'Magyar Nyelv' },
-  { code: 'ka', name: 'ქართული ენა' },
-  { code: 'hi', name: 'मानक हिन्दी' },
-  { code: 'fa', name: 'فارسی' },
-  { code: 'ja', name: '日本語' },
-  { code: 'pl', name: 'Polski' },
-  { code: 'pt_BR', name: 'Português Brasileiro' },
-  { code: 'zh', name: '中文' },
-  { code: 'fi', name: 'Suomi' },
-  { code: 'fr', name: 'Français' },
-  { code: 'sv', name: 'Svenska' },
-  { code: 'sq', name: 'Shqip' },
-  { code: 'tr', name: 'Türkçe' },
-  { code: 'uk', name: 'Українська Mова' },
-  { code: 'ru', name: 'Русский' },
-  { code: 'nl', name: 'Nederlands' },
-  { code: 'it', name: 'Italiano' },
+  { code: "ca", name: "Català" },
+  { code: "en", name: "English" },
+  { code: "el", name: "Ελληνικά" },
+  { code: "eu", name: "Euskara" },
+  { code: "eo", name: "Esperanto" },
+  { code: "es", name: "Español" },
+  { code: "de", name: "Deutsch" },
+  { code: "gl", name: "Galego" },
+  { code: "hu", name: "Magyar Nyelv" },
+  { code: "ka", name: "ქართული ენა" },
+  { code: "hi", name: "मानक हिन्दी" },
+  { code: "fa", name: "فارسی" },
+  { code: "ja", name: "日本語" },
+  { code: "pl", name: "Polski" },
+  { code: "pt_BR", name: "Português Brasileiro" },
+  { code: "zh", name: "中文" },
+  { code: "fi", name: "Suomi" },
+  { code: "fr", name: "Français" },
+  { code: "sv", name: "Svenska" },
+  { code: "sq", name: "Shqip" },
+  { code: "tr", name: "Türkçe" },
+  { code: "uk", name: "Українська Mова" },
+  { code: "ru", name: "Русский" },
+  { code: "nl", name: "Nederlands" },
+  { code: "it", name: "Italiano" },
 ];
 
 export const themes = [
-  'litera',
-  'materia',
-  'minty',
-  'solar',
-  'united',
-  'cyborg',
-  'darkly',
-  'journal',
-  'sketchy',
-  'vaporwave',
-  'vaporwave-dark',
-  'i386',
-  'litely',
+  "litera",
+  "materia",
+  "minty",
+  "solar",
+  "united",
+  "cyborg",
+  "darkly",
+  "journal",
+  "sketchy",
+  "vaporwave",
+  "vaporwave-dark",
+  "i386",
+  "litely",
 ];
 
 const DEFAULT_ALPHABET =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 function getRandomCharFromAlphabet(alphabet: string): string {
   return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
@@ -124,16 +124,13 @@ export function randomStr(
     .map(() => {
       return getRandomCharFromAlphabet(alphabet);
     })
-    .join('');
+    .join("");
 }
 
 export function wsJsonToRes(msg: WebSocketJsonResponse): WebSocketResponse {
-  if (!msg.op || !msg.data) throw new Error('');
+  if (!msg.op || !msg.data) throw new Error("");
   let opStr: string = msg.op;
-  return {
-    op: UserOperation[opStr],
-    data: msg.data,
-  };
+  return { op: UserOperation[opStr], data: msg.data };
 }
 
 // export const md = new markdown_it({
@@ -176,7 +173,7 @@ export function hotRankPost(post: Post): number {
 
 export function hotRank(score: number, timeStr: string): number {
   // Rank = ScaleFactor * sign(Score) * log(1 + abs(Score)) / (Time + 2)^Gravity
-  let date: Date = new Date(timeStr + 'Z'); // Add Z to convert from UTC date
+  let date: Date = new Date(timeStr + "Z"); // Add Z to convert from UTC date
   let now: Date = new Date();
   let hoursElapsed: number = (now.getTime() - date.getTime()) / 36e5;
 
@@ -262,22 +259,22 @@ export function capitalizeFirstLetter(str: string): string {
 }
 
 export function routeSortTypeToEnum(sort: string): SortType {
-  if (sort == 'new') {
+  if (sort == "new") {
     return SortType.New;
-  } else if (sort == 'hot') {
+  } else if (sort == "hot") {
     return SortType.Hot;
-  } else if (sort == 'topday') {
+  } else if (sort == "topday") {
     return SortType.TopDay;
-  } else if (sort == 'topweek') {
+  } else if (sort == "topweek") {
     return SortType.TopWeek;
-  } else if (sort == 'topmonth') {
+  } else if (sort == "topmonth") {
     return SortType.TopMonth;
-  } else if (sort == 'topyear') {
+  } else if (sort == "topyear") {
     return SortType.TopYear;
-  } else if (sort == 'topall') {
+  } else if (sort == "topall") {
     return SortType.TopAll;
   } else {
-    throw new Error('');
+    throw new Error("");
   }
 }
 
@@ -348,10 +345,11 @@ export function debounce(
 }
 
 export function getLanguage(): string {
-  let user = UserService.Instance.user;
-  let lang = user && user.lang ? user.lang : 'browser';
+  // let user = UserService.Instance.user;
+  // let lang = user && user.lang ? user.lang : "browser";
+  let lang = "browser";
 
-  if (lang == 'browser') {
+  if (lang == "browser") {
     return getBrowserLanguage();
   } else {
     return lang;
@@ -364,73 +362,73 @@ export function getBrowserLanguage(): string {
 
 export function getMomentLanguage(): string {
   let lang = getLanguage();
-  if (lang.startsWith('zh')) {
-    lang = 'zh-cn';
-  } else if (lang.startsWith('sv')) {
-    lang = 'sv';
-  } else if (lang.startsWith('fr')) {
-    lang = 'fr';
-  } else if (lang.startsWith('de')) {
-    lang = 'de';
-  } else if (lang.startsWith('ru')) {
-    lang = 'ru';
-  } else if (lang.startsWith('es')) {
-    lang = 'es';
-  } else if (lang.startsWith('eo')) {
-    lang = 'eo';
-  } else if (lang.startsWith('nl')) {
-    lang = 'nl';
-  } else if (lang.startsWith('it')) {
-    lang = 'it';
-  } else if (lang.startsWith('fi')) {
-    lang = 'fi';
-  } else if (lang.startsWith('ca')) {
-    lang = 'ca';
-  } else if (lang.startsWith('fa')) {
-    lang = 'fa';
-  } else if (lang.startsWith('pl')) {
-    lang = 'pl';
-  } else if (lang.startsWith('pt')) {
-    lang = 'pt-br';
-  } else if (lang.startsWith('ja')) {
-    lang = 'ja';
-  } else if (lang.startsWith('ka')) {
-    lang = 'ka';
-  } else if (lang.startsWith('hi')) {
-    lang = 'hi';
-  } else if (lang.startsWith('el')) {
-    lang = 'el';
-  } else if (lang.startsWith('eu')) {
-    lang = 'eu';
-  } else if (lang.startsWith('gl')) {
-    lang = 'gl';
-  } else if (lang.startsWith('tr')) {
-    lang = 'tr';
-  } else if (lang.startsWith('hu')) {
-    lang = 'hu';
-  } else if (lang.startsWith('uk')) {
-    lang = 'uk';
-  } else if (lang.startsWith('sq')) {
-    lang = 'sq';
+  if (lang.startsWith("zh")) {
+    lang = "zh-cn";
+  } else if (lang.startsWith("sv")) {
+    lang = "sv";
+  } else if (lang.startsWith("fr")) {
+    lang = "fr";
+  } else if (lang.startsWith("de")) {
+    lang = "de";
+  } else if (lang.startsWith("ru")) {
+    lang = "ru";
+  } else if (lang.startsWith("es")) {
+    lang = "es";
+  } else if (lang.startsWith("eo")) {
+    lang = "eo";
+  } else if (lang.startsWith("nl")) {
+    lang = "nl";
+  } else if (lang.startsWith("it")) {
+    lang = "it";
+  } else if (lang.startsWith("fi")) {
+    lang = "fi";
+  } else if (lang.startsWith("ca")) {
+    lang = "ca";
+  } else if (lang.startsWith("fa")) {
+    lang = "fa";
+  } else if (lang.startsWith("pl")) {
+    lang = "pl";
+  } else if (lang.startsWith("pt")) {
+    lang = "pt-br";
+  } else if (lang.startsWith("ja")) {
+    lang = "ja";
+  } else if (lang.startsWith("ka")) {
+    lang = "ka";
+  } else if (lang.startsWith("hi")) {
+    lang = "hi";
+  } else if (lang.startsWith("el")) {
+    lang = "el";
+  } else if (lang.startsWith("eu")) {
+    lang = "eu";
+  } else if (lang.startsWith("gl")) {
+    lang = "gl";
+  } else if (lang.startsWith("tr")) {
+    lang = "tr";
+  } else if (lang.startsWith("hu")) {
+    lang = "hu";
+  } else if (lang.startsWith("uk")) {
+    lang = "uk";
+  } else if (lang.startsWith("sq")) {
+    lang = "sq";
   } else {
-    lang = 'en';
+    lang = "en";
   }
   return lang;
 }
 
-export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
+export function setTheme(theme: string = "darkly", loggedIn: boolean = false) {
   console.log(theme, loggedIn);
 }
 
 export function loadCss(id: string, loc: string) {
   if (!document.getElementById(id)) {
-    var head = document.getElementsByTagName('head')[0];
-    var link = document.createElement('link');
+    var head = document.getElementsByTagName("head")[0];
+    var link = document.createElement("link");
     link.id = id;
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
+    link.rel = "stylesheet";
+    link.type = "text/css";
     link.href = loc;
-    link.media = 'all';
+    link.media = "all";
     head.appendChild(link);
   }
 }
@@ -445,33 +443,33 @@ export function objectFlip(obj: any) {
 
 export function pictrsAvatarThumbnail(src: string): string {
   // sample url: http://localhost:8535/pictrs/image/thumbnail256/gs7xuu.jpg
-  let split = src.split('/pictrs/image');
+  let split = src.split("/pictrs/image");
   let out = `${split[0]}/pictrs/image/${
-    canUseWebP() ? 'webp/' : ''
+    canUseWebP() ? "webp/" : ""
   }thumbnail96${split[1]}`;
   return out;
 }
 
-export function showAvatars(): boolean {
-  return (
-    (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
-    !UserService.Instance.user
-  );
-}
+// export function showAvatars(): boolean {
+//   return (
+//     (UserService.Instance.user && UserService.Instance.user.show_avatars) ||
+//     !UserService.Instance.user
+//   );
+// }
 
 // Converts to image thumbnail
 export function pictrsImage(hash: string, thumbnail: boolean = false): string {
   let root = `/pictrs/image`;
 
   // Necessary for other servers / domains
-  if (hash.includes('pictrs')) {
-    let split = hash.split('/pictrs/image/');
+  if (hash.includes("pictrs")) {
+    let split = hash.split("/pictrs/image/");
     root = `${split[0]}/pictrs/image`;
     hash = split[1];
   }
 
-  let out = `${root}/${canUseWebP() ? 'webp/' : ''}${
-    thumbnail ? 'thumbnail256/' : ''
+  let out = `${root}/${canUseWebP() ? "webp/" : ""}${
+    thumbnail ? "thumbnail256/" : ""
   }${hash}`;
   return out;
 }
@@ -615,13 +613,13 @@ export function isCommentType(item: Comment | PrivateMessage): item is Comment {
 //   }
 // }
 
-export function getListingTypeFromProps(props: any): ListingType {
-  return props.match.params.listing_type
-    ? routeListingTypeToEnum(props.match.params.listing_type)
-    : UserService.Instance.user
-    ? UserService.Instance.user.default_listing_type
-    : ListingType.All;
-}
+// export function getListingTypeFromProps(props: any): ListingType {
+//   return props.match.params.listing_type
+//     ? routeListingTypeToEnum(props.match.params.listing_type)
+//     : UserService.Instance.user
+//     ? UserService.Instance.user.default_listing_type
+//     : ListingType.All;
+// }
 
 // TODO might need to add a user setting for this too
 export function getDataTypeFromProps(props: any): DataType {
@@ -630,13 +628,13 @@ export function getDataTypeFromProps(props: any): DataType {
     : DataType.Post;
 }
 
-export function getSortTypeFromProps(props: any): SortType {
-  return props.match.params.sort
-    ? routeSortTypeToEnum(props.match.params.sort)
-    : UserService.Instance.user
-    ? UserService.Instance.user.default_sort_type
-    : SortType.Hot;
-}
+// export function getSortTypeFromProps(props: any): SortType {
+//   return props.match.params.sort
+//     ? routeSortTypeToEnum(props.match.params.sort)
+//     : UserService.Instance.user
+//     ? UserService.Instance.user.default_sort_type
+//     : SortType.Hot;
+// }
 
 export function getPageFromProps(props: any): number {
   return props.match.params.page ? Number(props.match.params.page) : 1;
@@ -847,9 +845,9 @@ function hsl(num: number) {
 export function previewLines(text: string, lines: number = 3): string {
   // Use lines * 2 because markdown requires 2 lines
   return text
-    .split('\n')
+    .split("\n")
     .slice(0, lines * 2)
-    .join('\n');
+    .join("\n");
 }
 
 export function hostname(url: string): string {

@@ -1,8 +1,8 @@
-import AsyncStorage from '@react-native-community/async-storage';
-import { User, LoginResponse } from '../interfaces';
-import { setTheme } from '../utils';
-import jwt_decode from 'jwt-decode';
-import { Subject } from 'rxjs';
+import AsyncStorage from "@react-native-community/async-storage";
+import { User, LoginResponse } from "../interfaces";
+import { setTheme } from "../utils";
+import jwt_decode from "jwt-decode";
+import { Subject } from "rxjs";
 
 export class UserService {
   private static _instance: UserService;
@@ -14,34 +14,34 @@ export class UserService {
   private constructor() {
     let jwt: string | null = null;
     (async () => {
-      jwt = await AsyncStorage.getItem('jwt');
+      jwt = await AsyncStorage.getItem("jwt");
     })();
     if (jwt) {
       this.setUser(jwt);
     } else {
       setTheme();
-      console.log('No JWT cookie found.');
+      console.log("No JWT cookie found.");
     }
   }
 
   public login(res: LoginResponse) {
     this.setUser(res.jwt);
-    AsyncStorage.setItem('jwt', res.jwt);
-    console.log('JWT stored');
+    AsyncStorage.setItem("jwt", res.jwt);
+    console.log("JWT stored");
   }
 
   public logout() {
     this.user = undefined;
-    AsyncStorage.removeItem('jwt');
+    AsyncStorage.removeItem("jwt");
     setTheme();
     this.sub.next({ user: undefined });
-    console.log('Logged out.');
+    console.log("Logged out.");
   }
 
   public get auth(): string {
     let jwt: string | null = null;
     (async () => {
-      jwt = await AsyncStorage.getItem('jwt');
+      jwt = await AsyncStorage.getItem("jwt");
     })();
     if (!jwt) throw new Error();
     return jwt;
