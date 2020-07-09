@@ -1,29 +1,34 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-} from 'react-native';
-import { retryWhen, delay, take } from 'rxjs/operators';
-import { WebSocketService, UserService } from '../services';
-import { WebSocketJsonResponse, LoginResponse } from '../interfaces';
-import { wsJsonToRes } from '../utils';
-import { i18n } from '../i18next';
+} from "react-native";
+import { retryWhen, delay, take } from "rxjs/operators";
+import { WebSocketJsonResponse, LoginResponse } from "../interfaces";
+import { wsJsonToRes } from "../utils";
+import { i18n } from "../i18next";
+import authStyles from "../styles/auth";
+import { ServiceContext } from "../contexts/ServiceContext";
+import { AuthContext } from "../contexts/AuthContext";
+import { colors } from "../styles/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const initialState = {
   username_or_email: undefined,
   password: undefined,
 };
 
-const Login = (props: any) => {
+const Login: React.FC = () => {
   const [state, setState] = React.useReducer(
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
   );
   const [loading, setLoading] = React.useState(false);
+  const { service } = React.useContext(ServiceContext);
+  const { setJwt } = React.useContext(AuthContext);
 
   const parseMessage = (msg: WebSocketJsonResponse) => {
     let res = wsJsonToRes(msg);
@@ -34,55 +39,69 @@ const Login = (props: any) => {
     } else {
       let data = res.data as LoginResponse;
       setState(initialState);
-      UserService.Instance.login(data);
-      WebSocketService.Instance.userJoin();
+      setJwt(data.jwt);
+      service?.userJoin();
       // toast(i18n.t('logged_in'));
-      props.history.push('/');
+      // props.history.push('/');
     }
   };
 
   React.useEffect(() => {
-    const subscription = WebSocketService.Instance.subject
+    console.log("Rendering...");
+    const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
       .subscribe(
         parseMessage,
         (err) => console.error(err),
-        () => console.log('complete')
+        () => console.log("complete")
       );
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
   const handleLoginSubmit = () => {
     setLoading(true);
-    WebSocketService.Instance.login(state);
+    service?.login(state);
+    setLoading(false);
   };
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text>{i18n.t('email')}</Text>
-        <TextInput placeholder='test@test.com' />
+    <SafeAreaView style={authStyles.container}>
+      <View style={authStyles.inputContainer}>
+        <Text style={authStyles.header}>{i18n.t("login")}</Text>
+        <Text style={authStyles.label}>{i18n.t("email")}</Text>
+        <TextInput
+          style={authStyles.input}
+          placeholder="john@doe.com"
+          placeholderTextColor={colors.gray}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
       </View>
-      <View>
-        <Text>{i18n.t('password')}</Text>
-        <TextInput placeholder='test@test.com' secureTextEntry />
+      <View style={authStyles.inputContainer}>
+        <Text style={authStyles.label}>{i18n.t("password")}</Text>
+        <TextInput
+          style={authStyles.input}
+          placeholder="password"
+          secureTextEntry
+          placeholderTextColor={colors.gray}
+        />
       </View>
-      <TouchableOpacity onPress={handleLoginSubmit}>
-        {loading ? <ActivityIndicator /> : <Text>{i18n.t('login')}</Text>}
+      <TouchableOpacity
+        style={authStyles.button}
+        onPress={handleLoginSubmit}
+        activeOpacity={0.8}
+      >
+        {loading ? (
+          <ActivityIndicator />
+        ) : (
+          <Text style={authStyles.buttonText}>{i18n.t("login")}</Text>
+        )}
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  input: {},
-  button: {},
-});
 
 export default Login;

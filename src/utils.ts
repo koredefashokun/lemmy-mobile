@@ -37,22 +37,19 @@ import {
   SearchType,
   WebSocketResponse,
   WebSocketJsonResponse,
-  SearchForm,
-  SearchResponse,
+  // SearchForm,
+  // SearchResponse,
   CommentResponse,
   PostResponse,
 } from './interfaces';
-import { UserService, WebSocketService } from './services';
+import { UserService } from './services';
 
-import Tribute from 'tributejs/src/Tribute.js';
-import markdown_it from 'markdown-it';
-import markdownitEmoji from 'markdown-it-emoji/light';
-import markdown_it_container from 'markdown-it-container';
-import twemoji from 'twemoji';
-import emojiShortName from 'emoji-short-name';
-import Toastify from 'toastify-js';
-import tippy from 'tippy.js';
-import EmojiButton from '@joeattardi/emoji-button';
+// import Tribute from 'tributejs/src/Tribute.js';
+// import markdown_it from 'markdown-it';
+// import markdownitEmoji from 'markdown-it-emoji/light';
+// import markdown_it_container from 'markdown-it-container';
+// import twemoji from 'twemoji';
+// import emojiShortName from 'emoji-short-name';
 
 export const repoUrl = 'https://github.com/LemmyNet/lemmy';
 export const helpGuideUrl = '/docs/about_guide.html';
@@ -108,14 +105,6 @@ export const themes = [
   'litely',
 ];
 
-export const emojiPicker = new EmojiButton({
-  // Use the emojiShortName from native
-  style: 'twemoji',
-  theme: 'dark',
-  position: 'auto-start',
-  // TODO i18n
-});
-
 const DEFAULT_ALPHABET =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -139,6 +128,7 @@ export function randomStr(
 }
 
 export function wsJsonToRes(msg: WebSocketJsonResponse): WebSocketResponse {
+  if (!msg.op || !msg.data) throw new Error('');
   let opStr: string = msg.op;
   return {
     op: UserOperation[opStr],
@@ -146,35 +136,35 @@ export function wsJsonToRes(msg: WebSocketJsonResponse): WebSocketResponse {
   };
 }
 
-export const md = new markdown_it({
-  html: false,
-  linkify: true,
-  typographer: true,
-})
-  .use(markdown_it_container, 'spoiler', {
-    validate: function (params: any) {
-      return params.trim().match(/^spoiler\s+(.*)$/);
-    },
+// export const md = new markdown_it({
+//   html: false,
+//   linkify: true,
+//   typographer: true,
+// })
+//   .use(markdown_it_container, 'spoiler', {
+//     validate: function (params: any) {
+//       return params.trim().match(/^spoiler\s+(.*)$/);
+//     },
 
-    render: function (tokens: any, idx: any) {
-      var m = tokens[idx].info.trim().match(/^spoiler\s+(.*)$/);
+//     render: function (tokens: any, idx: any) {
+//       var m = tokens[idx].info.trim().match(/^spoiler\s+(.*)$/);
 
-      if (tokens[idx].nesting === 1) {
-        // opening tag
-        return `<details><summary> ${md.utils.escapeHtml(m[1])} </summary>\n`;
-      } else {
-        // closing tag
-        return '</details>\n';
-      }
-    },
-  })
-  .use(markdownitEmoji, {
-    defs: objectFlip(emojiShortName),
-  });
+//       if (tokens[idx].nesting === 1) {
+//         // opening tag
+//         return `<details><summary> ${md.utils.escapeHtml(m[1])} </summary>\n`;
+//       } else {
+//         // closing tag
+//         return '</details>\n';
+//       }
+//     },
+//   })
+//   .use(markdownitEmoji, {
+//     defs: objectFlip(emojiShortName),
+//   });
 
-md.renderer.rules.emoji = function (token, idx) {
-  return twemoji.parse(token[idx].content);
-};
+// md.renderer.rules.emoji = function (token, idx) {
+//   return twemoji.parse(token[idx].content);
+// };
 
 export function hotRankComment(comment: Comment): number {
   return hotRank(comment.score, comment.published);
@@ -199,9 +189,9 @@ export function hotRank(score: number, timeStr: string): number {
   return rank;
 }
 
-export function mdToHtml(text: string) {
-  return { __html: md.render(text) };
-}
+// export function mdToHtml(text: string) {
+//   return { __html: md.render(text) };
+// }
 
 export function getUnixTime(text: string): number {
   return text ? new Date(text).getTime() / 1000 : undefined;
@@ -286,6 +276,8 @@ export function routeSortTypeToEnum(sort: string): SortType {
     return SortType.TopYear;
   } else if (sort == 'topall') {
     return SortType.TopAll;
+  } else {
+    throw new Error('');
   }
 }
 
@@ -427,31 +419,7 @@ export function getMomentLanguage(): string {
 }
 
 export function setTheme(theme: string = 'darkly', loggedIn: boolean = false) {
-  // unload all the other themes
-  for (var i = 0; i < themes.length; i++) {
-    let styleSheet = document.getElementById(themes[i]);
-    if (styleSheet) {
-      styleSheet.setAttribute('disabled', 'disabled');
-    }
-  }
-
-  // if the user is not logged in, we load the default themes and let the browser decide
-  if (!loggedIn) {
-    document.getElementById('default-light').removeAttribute('disabled');
-    document.getElementById('default-dark').removeAttribute('disabled');
-  } else {
-    document
-      .getElementById('default-light')
-      .setAttribute('disabled', 'disabled');
-    document
-      .getElementById('default-dark')
-      .setAttribute('disabled', 'disabled');
-
-    // Load the theme dynamically
-    let cssLoc = `/static/assets/css/themes/${theme}.min.css`;
-    loadCss(theme, cssLoc);
-    document.getElementById(theme).removeAttribute('disabled');
-  }
+  console.log(theme, loggedIn);
 }
 
 export function loadCss(id: string, loc: string) {
@@ -512,211 +480,140 @@ export function isCommentType(item: Comment | PrivateMessage): item is Comment {
   return (item as Comment).community_id !== undefined;
 }
 
-export function toast(text: string, background: string = 'success') {
-  let backgroundColor = `var(--${background})`;
-  Toastify({
-    text: text,
-    backgroundColor: backgroundColor,
-    gravity: 'bottom',
-    position: 'left',
-  }).showToast();
-}
+// export function setupTribute(): Tribute {
+//   return new Tribute({
+//     collection: [
+//       // Emojis
+//       {
+//         trigger: ':',
+//         menuItemTemplate: (item: any) => {
+//           let shortName = `:${item.original.key}:`;
+//           let twemojiIcon = twemoji.parse(item.original.val);
+//           return `${twemojiIcon} ${shortName}`;
+//         },
+//         selectTemplate: (item: any) => {
+//           return `:${item.original.key}:`;
+//         },
+//         values: Object.entries(emojiShortName).map((e) => {
+//           return { key: e[1], val: e[0] };
+//         }),
+//         allowSpaces: false,
+//         autocompleteMode: true,
+//         menuItemLimit: mentionDropdownFetchLimit,
+//         menuShowMinLength: 2,
+//       },
+//       // Users
+//       {
+//         trigger: '@',
+//         selectTemplate: (item: any) => {
+//           let link = item.original.local
+//             ? `[${item.original.key}](/u/${item.original.name})`
+//             : `[${item.original.key}](/user/${item.original.id})`;
+//           return link;
+//         },
+//         values: (text: string, cb: any) => {
+//           userSearch(text, (users: any) => cb(users));
+//         },
+//         allowSpaces: false,
+//         autocompleteMode: true,
+//         menuItemLimit: mentionDropdownFetchLimit,
+//         menuShowMinLength: 2,
+//       },
 
-export function pictrsDeleteToast(
-  clickToDeleteText: string,
-  deletePictureText: string,
-  deleteUrl: string
-) {
-  let backgroundColor = `var(--light)`;
-  let toast = Toastify({
-    text: clickToDeleteText,
-    backgroundColor: backgroundColor,
-    gravity: 'top',
-    position: 'right',
-    duration: 10000,
-    onClick: () => {
-      if (toast) {
-        window.location.replace(deleteUrl);
-        alert(deletePictureText);
-        toast.hideToast();
-      }
-    },
-    close: true,
-  }).showToast();
-}
+//       // Communities
+//       {
+//         trigger: '!',
+//         selectTemplate: (item: any) => {
+//           let link = item.original.local
+//             ? `[${item.original.key}](/c/${item.original.name})`
+//             : `[${item.original.key}](/community/${item.original.id})`;
+//           return link;
+//         },
+//         values: (text: string, cb: any) => {
+//           communitySearch(text, (communities: any) => cb(communities));
+//         },
+//         allowSpaces: false,
+//         autocompleteMode: true,
+//         menuItemLimit: mentionDropdownFetchLimit,
+//         menuShowMinLength: 2,
+//       },
+//     ],
+//   });
+// }
 
-export function messageToastify(
-  creator: string,
-  avatar: string,
-  body: string,
-  link: string,
-  router: any
-) {
-  let backgroundColor = `var(--light)`;
+// function userSearch(text: string, cb: any) {
+//   if (text) {
+//     let form: SearchForm = {
+//       q: text,
+//       type_: SearchType[SearchType.Users],
+//       sort: SortType[SortType.TopAll],
+//       page: 1,
+//       limit: mentionDropdownFetchLimit,
+//     };
 
-  let toast = Toastify({
-    text: `${body}<br />${creator}`,
-    avatar: avatar,
-    backgroundColor: backgroundColor,
-    className: 'text-dark',
-    close: true,
-    gravity: 'top',
-    position: 'right',
-    duration: 5000,
-    onClick: () => {
-      if (toast) {
-        toast.hideToast();
-        router.history.push(link);
-      }
-    },
-  }).showToast();
-}
+//     WebSocketService.Instance.search(form);
 
-export function setupTribute(): Tribute {
-  return new Tribute({
-    collection: [
-      // Emojis
-      {
-        trigger: ':',
-        menuItemTemplate: (item: any) => {
-          let shortName = `:${item.original.key}:`;
-          let twemojiIcon = twemoji.parse(item.original.val);
-          return `${twemojiIcon} ${shortName}`;
-        },
-        selectTemplate: (item: any) => {
-          return `:${item.original.key}:`;
-        },
-        values: Object.entries(emojiShortName).map((e) => {
-          return { key: e[1], val: e[0] };
-        }),
-        allowSpaces: false,
-        autocompleteMode: true,
-        menuItemLimit: mentionDropdownFetchLimit,
-        menuShowMinLength: 2,
-      },
-      // Users
-      {
-        trigger: '@',
-        selectTemplate: (item: any) => {
-          let link = item.original.local
-            ? `[${item.original.key}](/u/${item.original.name})`
-            : `[${item.original.key}](/user/${item.original.id})`;
-          return link;
-        },
-        values: (text: string, cb: any) => {
-          userSearch(text, (users: any) => cb(users));
-        },
-        allowSpaces: false,
-        autocompleteMode: true,
-        menuItemLimit: mentionDropdownFetchLimit,
-        menuShowMinLength: 2,
-      },
+//     this.userSub = WebSocketService.Instance.subject.subscribe(
+//       (msg) => {
+//         let res = wsJsonToRes(msg);
+//         if (res.op == UserOperation.Search) {
+//           let data = res.data as SearchResponse;
+//           let users = data.users.map((u) => {
+//             return {
+//               key: `@${u.name}@${hostname(u.actor_id)}`,
+//               name: u.name,
+//               local: u.local,
+//               id: u.id,
+//             };
+//           });
+//           cb(users);
+//           this.userSub.unsubscribe();
+//         }
+//       },
+//       (err) => console.error(err),
+//       () => console.log('complete')
+//     );
+//   } else {
+//     cb([]);
+//   }
+// }
 
-      // Communities
-      {
-        trigger: '!',
-        selectTemplate: (item: any) => {
-          let link = item.original.local
-            ? `[${item.original.key}](/c/${item.original.name})`
-            : `[${item.original.key}](/community/${item.original.id})`;
-          return link;
-        },
-        values: (text: string, cb: any) => {
-          communitySearch(text, (communities: any) => cb(communities));
-        },
-        allowSpaces: false,
-        autocompleteMode: true,
-        menuItemLimit: mentionDropdownFetchLimit,
-        menuShowMinLength: 2,
-      },
-    ],
-  });
-}
+// function communitySearch(text: string, cb: any) {
+//   if (text) {
+//     let form: SearchForm = {
+//       q: text,
+//       type_: SearchType[SearchType.Communities],
+//       sort: SortType[SortType.TopAll],
+//       page: 1,
+//       limit: mentionDropdownFetchLimit,
+//     };
 
-let tippyInstance = tippy('[data-tippy-content]');
+//     WebSocketService.Instance.search(form);
 
-export function setupTippy() {
-  tippyInstance.forEach((e) => e.destroy());
-  tippyInstance = tippy('[data-tippy-content]', {
-    delay: [500, 0],
-    // Display on "long press"
-    touch: ['hold', 500],
-  });
-}
-
-function userSearch(text: string, cb: any) {
-  if (text) {
-    let form: SearchForm = {
-      q: text,
-      type_: SearchType[SearchType.Users],
-      sort: SortType[SortType.TopAll],
-      page: 1,
-      limit: mentionDropdownFetchLimit,
-    };
-
-    WebSocketService.Instance.search(form);
-
-    this.userSub = WebSocketService.Instance.subject.subscribe(
-      (msg) => {
-        let res = wsJsonToRes(msg);
-        if (res.op == UserOperation.Search) {
-          let data = res.data as SearchResponse;
-          let users = data.users.map((u) => {
-            return {
-              key: `@${u.name}@${hostname(u.actor_id)}`,
-              name: u.name,
-              local: u.local,
-              id: u.id,
-            };
-          });
-          cb(users);
-          this.userSub.unsubscribe();
-        }
-      },
-      (err) => console.error(err),
-      () => console.log('complete')
-    );
-  } else {
-    cb([]);
-  }
-}
-
-function communitySearch(text: string, cb: any) {
-  if (text) {
-    let form: SearchForm = {
-      q: text,
-      type_: SearchType[SearchType.Communities],
-      sort: SortType[SortType.TopAll],
-      page: 1,
-      limit: mentionDropdownFetchLimit,
-    };
-
-    WebSocketService.Instance.search(form);
-
-    this.communitySub = WebSocketService.Instance.subject.subscribe(
-      (msg) => {
-        let res = wsJsonToRes(msg);
-        if (res.op == UserOperation.Search) {
-          let data = res.data as SearchResponse;
-          let communities = data.communities.map((c) => {
-            return {
-              key: `!${c.name}@${hostname(c.actor_id)}`,
-              name: c.name,
-              local: c.local,
-              id: c.id,
-            };
-          });
-          cb(communities);
-          this.communitySub.unsubscribe();
-        }
-      },
-      (err) => console.error(err),
-      () => console.log('complete')
-    );
-  } else {
-    cb([]);
-  }
-}
+//     this.communitySub = WebSocketService.Instance.subject.subscribe(
+//       (msg) => {
+//         let res = wsJsonToRes(msg);
+//         if (res.op == UserOperation.Search) {
+//           let data = res.data as SearchResponse;
+//           let communities = data.communities.map((c) => {
+//             return {
+//               key: `!${c.name}@${hostname(c.actor_id)}`,
+//               name: c.name,
+//               local: c.local,
+//               id: c.id,
+//             };
+//           });
+//           cb(communities);
+//           this.communitySub.unsubscribe();
+//         }
+//       },
+//       (err) => console.error(err),
+//       () => console.log('complete')
+//     );
+//   } else {
+//     cb([]);
+//   }
+// }
 
 export function getListingTypeFromProps(props: any): ListingType {
   return props.match.params.listing_type
@@ -943,9 +840,9 @@ function hsl(num: number) {
   return `hsla(${num}, 35%, 50%, 1)`;
 }
 
-function randomHsl() {
-  return `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
-}
+// function randomHsl() {
+//   return `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
+// }
 
 export function previewLines(text: string, lines: number = 3): string {
   // Use lines * 2 because markdown requires 2 lines

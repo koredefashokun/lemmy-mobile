@@ -1,4 +1,4 @@
-import { wsUri } from '../env';
+import { wsUri } from "../env";
 import {
   LoginForm,
   RegisterForm,
@@ -25,8 +25,6 @@ import {
   TransferSiteForm,
   BanUserForm,
   SiteForm,
-  Site,
-  UserView,
   GetRepliesForm,
   GetUserMentionsForm,
   EditUserMentionForm,
@@ -44,24 +42,19 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
-} from '../interfaces';
-import { UserService } from './';
-import { i18n } from '../i18next';
-import { toast } from '../utils';
-import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
-import ReconnectingWebSocket from 'reconnecting-websocket';
+} from "../interfaces";
+import { UserService } from "./UserService";
+import { Observable } from "rxjs";
+import { share } from "rxjs/operators";
+import ReconnectingWebSocket from "reconnecting-websocket";
 
 export class WebSocketService {
-  private static _instance: WebSocketService;
   public ws: ReconnectingWebSocket;
   public subject: Observable<any>;
+  public jwt: string | null;
 
-  public site: Site;
-  public admins: Array<UserView>;
-  public banned: Array<UserView>;
-
-  private constructor() {
+  constructor(jwt: string | null) {
+    this.jwt = jwt;
     this.ws = new ReconnectingWebSocket(wsUri);
     let firstConnect = true;
 
@@ -86,10 +79,6 @@ export class WebSocketService {
         firstConnect = false;
       };
     }).pipe(share());
-  }
-
-  public static get Instance() {
-    return this._instance || (this._instance = new this());
   }
 
   public userJoin() {
@@ -336,12 +325,8 @@ export class WebSocketService {
   private setAuth(obj: any, throwErr: boolean = true) {
     obj.auth = UserService.Instance.auth;
     if (obj.auth == null && throwErr) {
-      toast(i18n.t('not_logged_in'), 'danger');
-      throw 'Not logged in';
+      // toast(i18n.t('not_logged_in'), 'danger');
+      throw "Not logged in";
     }
   }
 }
-
-window.onbeforeunload = () => {
-  WebSocketService.Instance.ws.close();
-};
