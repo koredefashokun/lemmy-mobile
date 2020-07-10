@@ -139,9 +139,8 @@ const useWebSocketService = () => {
     },
 
     getFollowedCommunities: () => {
-      let form: GetFollowedCommunitiesForm = {
-        auth: UserService.Instance.auth,
-      };
+      if (!jwt) throw new Error("sdfdf");
+      let form: GetFollowedCommunitiesForm = { auth: jwt };
       ws.send(wsSendWrapper(UserOperation.GetFollowedCommunities, form));
     },
 

@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 
 import Login from "./src/screens/Login";
 import Register from "./src/screens/Register";
+import Home from "./src/screens/Home";
 
 import { AuthProvider } from "./src/contexts/AuthContext";
 
@@ -24,8 +25,9 @@ const AuthNavigator = () => {
 
 const AppNavigator = () => {
   return (
-    <AppStack.Navigator headerMode="none">
+    <AppStack.Navigator headerMode="none" initialRouteName="Home">
       <AppStack.Screen name="Auth" component={AuthNavigator} />
+      <AppStack.Screen name="Home" component={Home} />
     </AppStack.Navigator>
   );
 };

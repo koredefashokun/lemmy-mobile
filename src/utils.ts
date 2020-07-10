@@ -347,7 +347,7 @@ export function debounce(
 export function getLanguage(): string {
   // let user = UserService.Instance.user;
   // let lang = user && user.lang ? user.lang : "browser";
-  let lang = "browser";
+  let lang = "en";
 
   if (lang == "browser") {
     return getBrowserLanguage();
@@ -623,9 +623,10 @@ export function isCommentType(item: Comment | PrivateMessage): item is Comment {
 
 // TODO might need to add a user setting for this too
 export function getDataTypeFromProps(props: any): DataType {
-  return props.match.params.data_type
-    ? routeDataTypeToEnum(props.match.params.data_type)
-    : DataType.Post;
+  return DataType.Post;
+  // return props.match.params.data_type
+  //   ? routeDataTypeToEnum(props.match.params.data_type)
+  //   : DataType.Post;
 }
 
 // export function getSortTypeFromProps(props: any): SortType {
@@ -637,7 +638,8 @@ export function getDataTypeFromProps(props: any): DataType {
 // }
 
 export function getPageFromProps(props: any): number {
-  return props.match.params.page ? Number(props.match.params.page) : 1;
+  return 1;
+  // return props.match.params.page ? Number(props.match.params.page) : 1;
 }
 
 export function editCommentRes(
