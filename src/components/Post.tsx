@@ -1,6 +1,6 @@
-import React from "react";
-import { View } from "react-native";
-import { retryWhen, delay, take } from "rxjs/operators";
+import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
   Post as PostI,
@@ -23,18 +23,21 @@ import {
   SearchResponse,
   GetCommunityResponse,
   WebSocketJsonResponse,
-} from "../interfaces";
-import CommentNodes from "./CommentNodes";
+} from '../interfaces';
+import CommentNodes from './CommentNodes';
 import {
   wsJsonToRes,
   editCommentRes,
   saveCommentRes,
   createCommentLikeRes,
   createPostLikeRes,
-} from "../utils";
-import { i18n } from "../i18next";
-import useWebSocketService from "../hooks/useWebSocketService";
-import { useRoute } from "@react-navigation/native";
+} from '../utils';
+import { i18n } from '../i18next';
+import useWebSocketService from '../hooks/useWebSocketService';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import PostListing from './PostListing';
+import { MainStackParamList } from '../../App';
 
 interface PostState {
   post: PostI | null;
@@ -81,13 +84,13 @@ const initialState: PostState = {
   },
 };
 
-const Post: React.FC = (props) => {
+const Post: React.FC = () => {
   const [state, setState] = React.useReducer(
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
   );
   const service = useWebSocketService();
-  const { params } = useRoute();
+  const { params } = useRoute<RouteProp<MainStackParamList, 'Post'>>();
 
   const handleCommentSortChange = (event: any) => {
     setState({ commentSort: Number(event.target.value) });
@@ -128,36 +131,46 @@ const Post: React.FC = (props) => {
 
   const commentsTree = () => {
     let nodes = buildCommentsTree();
+
     return (
-      <div>
-        <CommentNodes
-          nodes={nodes}
-          locked={state.post.locked}
-          moderators={state.moderators}
-          admins={state.siteRes.admins}
-          postCreatorId={state.post.creator_id}
-          sort={state.commentSort}
-          enableDownvotes={state.siteRes.site.enable_downvotes}
-        />
-      </div>
+      <CommentNodes
+        nodes={nodes}
+        locked={state.post.locked}
+        moderators={state.moderators}
+        admins={state.siteRes.admins}
+        postCreatorId={state.post.creator_id}
+        sort={state.commentSort}
+        enableDownvotes={state.siteRes.site.enable_downvotes}
+      />
     );
   };
 
   const parseMessage = (msg: WebSocketJsonResponse) => {
-    console.log(msg);
     let res = wsJsonToRes(msg);
     if (msg.error) {
       // toast(i18n.t(msg.error), "danger");
       return;
     } else if (msg.reconnect) {
-      service.getPost({ id: params?.postId as number });
+      service.getPost({ id: params.postId });
     } else if (res.op === UserOperation.GetPost) {
       let data = res.data as GetPostResponse;
 
       // Get cross-posts
-      if (state.post.url) {
+      const post_url = data.post.url;
+
+      setState({
+        post: data.post,
+        comments: data.comments,
+        community: data.community,
+        moderators: data.moderators,
+        siteRes: { ...state.siteRes, admins: data.admins },
+        online: data.online,
+        loading: false,
+      });
+
+      if (post_url) {
         let form: SearchForm = {
-          q: state.post.url,
+          q: post_url,
           type_: SearchType[SearchType.Url],
           sort: SortType[SortType.TopAll],
           page: 1,
@@ -165,28 +178,18 @@ const Post: React.FC = (props) => {
         };
         service.search(form);
       }
-
-      setState({
-        post: data.post,
-        comments: data.comments,
-        community: data.community,
-        moderators: data.moderators,
-        siteRes: { admins: data.admins },
-        online: data.online,
-        loading: false,
-      });
     } else if (res.op === UserOperation.CreateComment) {
       let data = res.data as CommentResponse;
 
       // Necessary since it might be a user reply
       if (data.recipient_ids.length === 0) {
-        state.comments.unshift(data.comment);
-        setState(state);
+        setState({ comments: state.comments.unshift(data.comment) });
       }
     } else if (res.op === UserOperation.EditComment) {
       let data = res.data as CommentResponse;
-      editCommentRes(data, state.comments);
-      setState(state);
+      editCommentRes(data, state.comments, (comments) =>
+        setState({ comments })
+      );
     } else if (res.op === UserOperation.SaveComment) {
       let data = res.data as CommentResponse;
       saveCommentRes(data, state.comments);
@@ -201,17 +204,20 @@ const Post: React.FC = (props) => {
       setState(state);
     } else if (res.op === UserOperation.EditPost) {
       let data = res.data as PostResponse;
-      state.post = data.post;
-      setState(state);
+      setState({ post: data.post });
     } else if (res.op === UserOperation.SavePost) {
       let data = res.data as PostResponse;
-      state.post = data.post;
-      setState(state);
+      setState({ post: data.post });
     } else if (res.op === UserOperation.EditCommunity) {
       let data = res.data as CommunityResponse;
-      state.community = data.community;
-      state.post.community_id = data.community.id;
-      state.post.community_name = data.community.name;
+      setState({
+        community: data.community,
+        post: {
+          ...state.post,
+          community_id: data.community.id,
+          community_name: data.community.name,
+        },
+      });
       setState(state);
     } else if (res.op === UserOperation.FollowCommunity) {
       let data = res.data as CommunityResponse;
@@ -221,66 +227,88 @@ const Post: React.FC = (props) => {
       setState(state);
     } else if (res.op === UserOperation.BanFromCommunity) {
       let data = res.data as BanFromCommunityResponse;
-      state.comments
-        .filter((c) => c.creator_id === data.user.id)
-        .forEach((c) => (c.banned_from_community = data.banned));
+      setState({
+        comments: state.comments
+          .filter((c) => c.creator_id === data.user.id)
+          .forEach((c) => (c.banned_from_community = data.banned)),
+      });
       if (state.post.creator_id === data.user.id) {
-        state.post.banned_from_community = data.banned;
+        setState({
+          post: { ...state.post, banned_from_community: data.banned },
+        });
       }
-      setState(state);
     } else if (res.op === UserOperation.AddModToCommunity) {
       let data = res.data as AddModToCommunityResponse;
-      state.moderators = data.moderators;
-      setState(state);
+      setState({ moderators: data.moderators });
     } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
-      state.comments
-        .filter((c) => c.creator_id === data.user.id)
-        .forEach((c) => (c.banned = data.banned));
+      setState({
+        comments: state.comments
+          .filter((c) => c.creator_id === data.user.id)
+          .forEach((c) => (c.banned = data.banned)),
+      });
       if (state.post.creator_id === data.user.id) {
-        state.post.banned = data.banned;
+        setState({ post: { ...state.post, banned: data.banned } });
       }
-      setState(state);
     } else if (res.op === UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
-      state.siteRes.admins = data.admins;
-      setState(state);
+      setState({ siteRes: { ...state.siteRes, admins: data.admins } });
     } else if (res.op === UserOperation.Search) {
       let data = res.data as SearchResponse;
-      state.crossPosts = data.posts?.filter(
-        (p) => p.id != Number(props.match.params.id)
-      );
+      const crossPosts = data.posts?.filter((p) => p.id != params.postId);
+      setState({ crossPosts });
       if (state.crossPosts.length) {
-        state.post.duplicates = state.crossPosts;
+        setState({ post: { ...state.post, duplicates: crossPosts } });
       }
-      setState(state);
     } else if (
       res.op === UserOperation.TransferSite ||
       res.op === UserOperation.GetSite
     ) {
       let data = res.data as GetSiteResponse;
-      state.siteRes = data;
-      setState(state);
+      setState({ siteRes: data });
     } else if (res.op === UserOperation.TransferCommunity) {
       let data = res.data as GetCommunityResponse;
-      state.community = data.community;
-      state.moderators = data.moderators;
-      state.siteRes.admins = data.admins;
-      setState(state);
+      setState({
+        community: data.community,
+        moderators: data.moderators,
+        siteRes: { ...state.siteRes, admins: data.admins },
+      });
     }
   };
 
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log("complete"));
+      .subscribe(parseMessage, console.error, () => console.log('complete'));
+
+    let form: GetPostForm = { id: params.postId };
+
+    service.getPost(form);
+    service.getSite();
 
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
-  return <View></View>;
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#222222' }}>
+      {state.loading ? (
+        <ActivityIndicator />
+      ) : (
+        <View>
+          <PostListing
+            post={state.post}
+            moderators={state.moderators}
+            admins={state.admins}
+            enableDownvotes={state.siteRes.site.enable_downvotes}
+            enableNsfw={state.siteRes.site.enable_nsfw}
+          />
+          {commentsTree()}
+        </View>
+      )}
+    </SafeAreaView>
+  );
 };
 
 export default Post;

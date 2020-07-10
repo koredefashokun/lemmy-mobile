@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text } from "react-native";
+import React from 'react';
+import { View, Text } from 'react-native';
 import {
   CommentNode as CommentNodeI,
   CommentLikeForm,
@@ -17,10 +17,11 @@ import {
   BanType,
   CommentSortType,
   SortType,
-} from "../interfaces";
-import { colorList } from "../utils";
-import { i18n } from "../i18next";
-import { TouchableOpacity } from "react-native-gesture-handler";
+} from '../interfaces';
+import { colorList } from '../utils';
+import { i18n } from '../i18next';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import CommentNodes from './CommentNodes';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -99,19 +100,52 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
   const { node } = props;
 
   return (
-    <View>
-      <View>
-        <View>
+    <View
+      style={[
+        node.comment.parent_id && !props.noIndent ? { marginLeft: 1 } : {},
+        { marginHorizontal: 8 },
+      ]}
+    >
+      <View
+        style={[
+          !props.noIndent && props.node.comment.parent_id
+            ? { borderLeftWidth: 2, borderLeftColor: state.borderColor }
+            : {},
+          { paddingVertical: 2 },
+        ]}
+      >
+        <View
+          style={
+            !props.noIndent && props.node.comment.parent_id
+              ? { marginLeft: 2 }
+              : {}
+          }
+        >
           <View>
+            <Text style={{ color: '#DEDEDE', fontSize: 15 }}>
+              {node.comment.content}
+            </Text>
             {props.showCommunity && (
               <>
-                <Text>{i18n.t("to")}</Text>
+                <Text>{i18n.t('to')}</Text>
                 <TouchableOpacity></TouchableOpacity>
               </>
             )}
           </View>
         </View>
       </View>
+      {node.children && (
+        <CommentNodes
+          nodes={node.children}
+          locked={props.locked}
+          moderators={props.moderators}
+          admins={props.admins}
+          postCreatorId={props.postCreatorId}
+          sort={props.sort}
+          sortType={props.sortType}
+          enableDownvotes={props.enableDownvotes}
+        />
+      )}
     </View>
   );
 };
