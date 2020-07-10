@@ -2,10 +2,29 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
-import { Post, CommunityUser, UserView } from '../interfaces';
+import { Post, CommunityUser, UserView, BanType } from '../interfaces';
 import { getMomentLanguage } from '../utils';
-import { colors } from '../styles/theme';
+// import { colors } from '../styles/theme';
 import { useNavigation } from '@react-navigation/native';
+
+interface PostListingState {
+  showEdit: boolean;
+  showRemoveDialog: boolean;
+  removeReason: string;
+  showBanDialog: boolean;
+  banReason: string;
+  banExpires: string;
+  banType: BanType;
+  showConfirmTransferSite: boolean;
+  showConfirmTransferCommunity: boolean;
+  imageExpanded: boolean;
+  viewSource: boolean;
+  showAdvanced: boolean;
+  my_vote: number;
+  score: number;
+  upvotes: number;
+  downvotes: number;
+}
 
 interface PostListingProps {
   post: Post;
@@ -19,6 +38,30 @@ interface PostListingProps {
 
 const PostListing: React.FC<PostListingProps> = (props) => {
   const { navigate } = useNavigation();
+
+  const initialState: PostListingState = {
+    showEdit: false,
+    showRemoveDialog: false,
+    removeReason: null,
+    showBanDialog: false,
+    banReason: null,
+    banExpires: null,
+    banType: BanType.Community,
+    showConfirmTransferSite: false,
+    showConfirmTransferCommunity: false,
+    imageExpanded: false,
+    viewSource: false,
+    showAdvanced: false,
+    my_vote: props.post.my_vote,
+    score: props.post.score,
+    upvotes: props.post.upvotes,
+    downvotes: props.post.downvotes,
+  };
+
+  const [state, setState] = React.useReducer(
+    (p: any, n: any) => ({ ...p, ...n }),
+    initialState
+  );
 
   React.useEffect(() => {
     const lang = getMomentLanguage();
@@ -60,7 +103,7 @@ const PostListing: React.FC<PostListingProps> = (props) => {
               style={{ marginRight: 5 }}
             />
             <Text style={{ fontSize: 16, fontWeight: '500', color: '#999' }}>
-              1
+              {state.score}
             </Text>
             <Feather
               name='arrow-down'
