@@ -51,16 +51,16 @@ const PostListing: React.FC<PostListingProps> = (props) => {
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Feather
               name="arrow-up"
-              color="#505050"
+              color="#999"
               size={20}
               style={{ marginRight: 5 }}
             />
-            <Text style={{ fontSize: 16, fontWeight: "500", color: "#505050" }}>
+            <Text style={{ fontSize: 16, fontWeight: "500", color: "#999" }}>
               1
             </Text>
             <Feather
               name="arrow-down"
-              color="#505050"
+              color="#999"
               size={20}
               style={{ marginLeft: 5 }}
             />

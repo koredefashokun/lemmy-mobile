@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Post } from "../interfaces";
 import { postSort } from "../utils";
-import { View, Text } from "react-native";
+import { View, Text, FlatList } from "react-native";
 import { i18n } from "../i18next";
 import PostListing from "./PostListing";
 
@@ -74,17 +74,20 @@ const PostListings = (props) => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#222222" }}>
       {props.posts.length > 0 ? (
-        outer().map((post) => (
-          <>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={outer()}
+          keyExtractor={(p) => p.id.toString()}
+          renderItem={({ item }) => (
             <PostListing
-              key={post.id}
-              post={post}
+              key={item.id}
+              post={item}
               showCommunity={props.showCommunity}
               enableDownvotes={props.enableDownvotes}
               enableNsfw={props.enableNsfw}
             />
-          </>
-        ))
+          )}
+        />
       ) : (
         <>
           <Text>{i18n.t("no_posts")}</Text>
