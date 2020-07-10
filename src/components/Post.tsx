@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { ScrollView, ActivityIndicator } from 'react-native';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
@@ -296,7 +296,7 @@ const Post: React.FC = () => {
       {state.loading ? (
         <ActivityIndicator />
       ) : (
-        <View>
+        <ScrollView>
           <PostListing
             post={state.post}
             moderators={state.moderators}
@@ -305,7 +305,7 @@ const Post: React.FC = () => {
             enableNsfw={state.siteRes.site.enable_nsfw}
           />
           {commentsTree()}
-        </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );

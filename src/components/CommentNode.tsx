@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import {
   CommentNode as CommentNodeI,
   CommentLikeForm,
@@ -20,7 +20,7 @@ import {
 } from '../interfaces';
 import { colorList } from '../utils';
 import { i18n } from '../i18next';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import moment from 'moment';
 import CommentNodes from './CommentNodes';
 
 interface CommentNodeState {
@@ -102,26 +102,41 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
   return (
     <View
       style={[
-        node.comment.parent_id && !props.noIndent ? { marginLeft: 1 } : {},
+        node.comment.parent_id && !props.noIndent ? { marginLeft: 4 } : {},
         { marginHorizontal: 8 },
       ]}
     >
       <View
         style={[
           !props.noIndent && props.node.comment.parent_id
-            ? { borderLeftWidth: 2, borderLeftColor: state.borderColor }
+            ? {
+                borderLeftWidth: 1,
+                borderLeftColor: state.borderColor,
+                marginLeft: 8,
+              }
             : {},
-          { paddingVertical: 2 },
+          { paddingVertical: 4 },
         ]}
       >
         <View
           style={
             !props.noIndent && props.node.comment.parent_id
-              ? { marginLeft: 2 }
+              ? { marginLeft: 4 }
               : {}
           }
         >
           <View>
+            <View style={{ flexDirection: 'row' }}>
+              <Text
+                style={{ fontWeight: '500', marginRight: 5, color: '#999' }}
+              >
+                {node.comment.creator_name} in {node.comment.community_name}
+              </Text>
+              <Text style={{ color: '#999' }}>•</Text>
+              <Text style={{ fontWeight: '500', marginLeft: 5, color: '#999' }}>
+                {moment.utc(node.comment.published).fromNow()}
+              </Text>
+            </View>
             <Text style={{ color: '#DEDEDE', fontSize: 15 }}>
               {node.comment.content}
             </Text>

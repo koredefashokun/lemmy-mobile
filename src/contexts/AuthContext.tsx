@@ -1,6 +1,6 @@
-import React from "react";
-import AsyncStorage from "@react-native-community/async-storage";
-import { AppLoading } from "expo";
+import React from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import { AppLoading } from 'expo';
 
 interface AuthContextValue {
   jwt: string | null;
@@ -20,7 +20,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     (async () => {
-      const savedToken = await AsyncStorage.getItem("jwt");
+      const savedToken = await AsyncStorage.getItem('jwt');
       if (savedToken) setJwt(savedToken);
       setLoading(false);
     })();
@@ -28,9 +28,9 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     if (!jwt) {
-      AsyncStorage.removeItem("jwt");
+      AsyncStorage.removeItem('jwt');
     } else {
-      AsyncStorage.setItem("jwt", jwt);
+      AsyncStorage.setItem('jwt', jwt);
     }
   }, [jwt]);
 
