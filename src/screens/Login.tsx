@@ -53,19 +53,18 @@ const Login: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (jLoading) return;
-    const subscription = service?.subject
+    const subscription = service.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
       .subscribe(parseMessage, console.error, () => console.log("complete"));
 
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
-  }, [jLoading]);
+  }, []);
 
   const handleLoginSubmit = () => {
     setLoading(true);
-    service?.login(state);
+    service.login(state);
     setLoading(false);
   };
 

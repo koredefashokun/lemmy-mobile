@@ -1,5 +1,4 @@
 import React from "react";
-import { View } from "react-native";
 import { retryWhen, delay, take } from "rxjs/operators";
 import useWebSocketService from "../hooks/useWebSocketService";
 import {
@@ -216,7 +215,7 @@ const Home: React.FC<MainProps> = (props) => {
     }
   };
 
-  return state.dataType == DataType.Post ? (
+  return state.dataType === DataType.Post ? (
     <PostListings
       posts={state.posts}
       showCommunity

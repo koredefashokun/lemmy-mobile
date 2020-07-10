@@ -8,11 +8,13 @@ import { StatusBar } from "expo-status-bar";
 import Login from "./src/screens/Login";
 import Register from "./src/screens/Register";
 import Home from "./src/screens/Home";
+import Post from "./src/components/Post";
 
 import { AuthProvider } from "./src/contexts/AuthContext";
 
 const AppStack = createStackNavigator();
 const AuthStack = createStackNavigator();
+const MainStack = createStackNavigator();
 
 const AuthNavigator = () => {
   return (
@@ -23,11 +25,20 @@ const AuthNavigator = () => {
   );
 };
 
+const MainNavigator = () => {
+  return (
+    <MainStack.Navigator>
+      <MainStack.Screen name="Home" component={Home} />
+      <MainStack.Screen name="Post" component={Post} />
+    </MainStack.Navigator>
+  );
+};
+
 const AppNavigator = () => {
   return (
-    <AppStack.Navigator headerMode="none" initialRouteName="Home">
+    <AppStack.Navigator headerMode="none" initialRouteName="Main">
       <AppStack.Screen name="Auth" component={AuthNavigator} />
-      <AppStack.Screen name="Home" component={Home} />
+      <AppStack.Screen name="Main" component={MainNavigator} />
     </AppStack.Navigator>
   );
 };
