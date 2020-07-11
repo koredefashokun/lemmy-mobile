@@ -21,6 +21,7 @@ import {
 import { colorList } from '../utils';
 import { i18n } from '../i18next';
 import moment from 'moment';
+import Markdown from 'react-native-markdown-display';
 import CommentNodes from './CommentNodes';
 
 interface CommentNodeState {
@@ -99,6 +100,16 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
 
   const { node } = props;
 
+  const commentUnlessRemoved = React.useMemo(
+    () =>
+      node.comment.removed
+        ? `*${i18n.t('removed')}*`
+        : node.comment.deleted
+        ? `*${i18n.t('deleted')}*`
+        : node.comment.content,
+    [node.comment]
+  );
+
   return (
     <View
       style={[
@@ -121,7 +132,7 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
         <View
           style={
             !props.noIndent && props.node.comment.parent_id
-              ? { marginLeft: 4 }
+              ? { marginLeft: 8 }
               : {}
           }
         >
@@ -130,16 +141,26 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
               <Text
                 style={{ fontWeight: '500', marginRight: 5, color: '#999' }}
               >
-                {node.comment.creator_name} in {node.comment.community_name}
+                {node.comment.creator_name}
               </Text>
               <Text style={{ color: '#999' }}>•</Text>
               <Text style={{ fontWeight: '500', marginLeft: 5, color: '#999' }}>
                 {moment.utc(node.comment.published).fromNow()}
               </Text>
             </View>
-            <Text style={{ color: '#DEDEDE', fontSize: 15 }}>
-              {node.comment.content}
-            </Text>
+            <Markdown
+              style={{
+                body: { color: '#DEDEDE', fontSize: 15 },
+                heading1: { fontWeight: '600' },
+                heading2: { fontWeight: '600' },
+                heading3: { fontWeight: '600' },
+                heading4: { fontWeight: '600' },
+                heading5: { fontWeight: '600' },
+                heading6: { fontWeight: '600' },
+              }}
+            >
+              {commentUnlessRemoved}
+            </Markdown>
             {props.showCommunity && (
               <>
                 <Text>{i18n.t('to')}</Text>

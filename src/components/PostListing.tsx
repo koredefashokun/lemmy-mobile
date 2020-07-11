@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import moment from 'moment';
 import { Post, CommunityUser, UserView, BanType } from '../interfaces';
 import { getMomentLanguage } from '../utils';
-// import { colors } from '../styles/theme';
+import { colors } from '../styles/theme';
 import { useNavigation } from '@react-navigation/native';
 
 interface PostListingState {
@@ -96,21 +96,19 @@ const PostListing: React.FC<PostListingProps> = (props) => {
         </Text>
         <View style={{ marginTop: 10 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Feather
-              name='arrow-up'
-              color='#999'
-              size={20}
-              style={{ marginRight: 5 }}
-            />
+            <TouchableOpacity style={{ marginRight: 5 }}>
+              <Feather
+                name='arrow-up'
+                color={state.my_vote === 1 ? colors.info : '#999'}
+                size={20}
+              />
+            </TouchableOpacity>
             <Text style={{ fontSize: 16, fontWeight: '500', color: '#999' }}>
               {state.score}
             </Text>
-            <Feather
-              name='arrow-down'
-              color='#999'
-              size={20}
-              style={{ marginLeft: 5 }}
-            />
+            <TouchableOpacity style={{ marginLeft: 5 }}>
+              <Feather name='arrow-down' color='#999' size={20} />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
