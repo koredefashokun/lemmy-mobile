@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Platform } from 'react-native';
 import {
   CommentNode as CommentNodeI,
   CommentLikeForm,
@@ -23,6 +23,7 @@ import { i18n } from '../i18next';
 import moment from 'moment';
 import Markdown from 'react-native-markdown-display';
 import CommentNodes from './CommentNodes';
+import { colors } from '../styles/theme';
 
 interface CommentNodeState {
   showReply: boolean;
@@ -150,13 +151,35 @@ const CommentNode: React.FC<CommentNodeProps> = (props) => {
             </View>
             <Markdown
               style={{
-                body: { color: '#DEDEDE', fontSize: 15 },
+                text: { color: '#DEDEDE' },
+                paragraph: { fontSize: 15, marginTop: 5 },
                 heading1: { fontWeight: '600' },
                 heading2: { fontWeight: '600' },
                 heading3: { fontWeight: '600' },
                 heading4: { fontWeight: '600' },
                 heading5: { fontWeight: '600' },
                 heading6: { fontWeight: '600' },
+                link: { color: colors.info, textDecorationLine: 'none' },
+                blockquote: {
+                  backgroundColor: 'transparent',
+                  borderLeftColor: colors.secondary,
+                  paddingHorizontal: 8,
+                  paddingVertical: 0,
+                  borderLeftWidth: 4,
+                },
+                code_inline: {
+                  backgroundColor: 'transparent',
+                  color: colors.pink,
+                  fontFamily:
+                    Platform.OS === 'android' ? 'monospace' : 'Courier',
+                },
+                body: {
+                  color: '#DEDEDE',
+                },
+                bullet_list_icon: {
+                  fontSize: 30,
+                  fontWeight: 'bold',
+                },
               }}
             >
               {commentUnlessRemoved}

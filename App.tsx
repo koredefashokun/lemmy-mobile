@@ -9,7 +9,8 @@ import Register from './src/screens/Register';
 import Home from './src/screens/Home';
 import Post from './src/components/Post';
 
-import { AuthProvider } from './src/contexts/AuthContext';
+import { AuthProvider, AuthContext } from './src/contexts/AuthContext';
+import { ServiceProvider } from './src/contexts/ServiceContext';
 
 const AppStack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -39,8 +40,13 @@ const MainNavigator = () => {
 };
 
 const AppNavigator = () => {
+  const { jwt } = React.useContext(AuthContext);
+
   return (
-    <AppStack.Navigator headerMode='none' initialRouteName='Main'>
+    <AppStack.Navigator
+      headerMode='none'
+      initialRouteName={jwt ? 'Main' : 'Auth'}
+    >
       <AppStack.Screen name='Auth' component={AuthNavigator} />
       <AppStack.Screen name='Main' component={MainNavigator} />
     </AppStack.Navigator>
@@ -50,12 +56,14 @@ const AppNavigator = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <StatusBar style='light' />
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <ServiceProvider>
+        <StatusBar style='light' />
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </ServiceProvider>
     </AuthProvider>
   );
 };

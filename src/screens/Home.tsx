@@ -1,6 +1,5 @@
-import React from "react";
-import { retryWhen, delay, take } from "rxjs/operators";
-import useWebSocketService from "../hooks/useWebSocketService";
+import React from 'react';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   wsJsonToRes,
   editPostFindRes,
@@ -9,8 +8,8 @@ import {
   getPageFromProps,
   fetchLimit,
   commentsToFlatNodes,
-} from "../utils";
-import { i18n } from "../i18next";
+} from '../utils';
+// import { i18n } from "../i18next";
 import {
   UserOperation,
   GetFollowedCommunitiesResponse,
@@ -30,10 +29,11 @@ import {
   SortType,
   GetPostsForm,
   GetCommentsForm,
-} from "../interfaces";
-import { UserService } from "../services";
-import CommentNodes from "../components/CommentNodes";
-import PostListings from "../components/PostListings";
+} from '../interfaces';
+import { UserService } from '../services';
+import CommentNodes from '../components/CommentNodes';
+import PostListings from '../components/PostListings';
+import { ServiceContext } from '../contexts/ServiceContext';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -86,14 +86,14 @@ const Home: React.FC<MainProps> = (props) => {
     (p: typeof initialState, n: typeof initialState) => ({ ...p, ...n }),
     initialState
   );
-  const service = useWebSocketService();
+  const service = React.useContext(ServiceContext);
 
   React.useEffect(() => {
-    const subscription = service.subject
+    const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log("complete"));
+      .subscribe(parseMessage, console.error, () => console.log('complete'));
 
-    service.getFollowedCommunities();
+    service?.getFollowedCommunities();
     fetchData();
 
     return () => {
@@ -109,7 +109,7 @@ const Home: React.FC<MainProps> = (props) => {
         sort: SortType[state.sort],
         type_: ListingType[state.listingType],
       };
-      service.getPosts(getPostsForm);
+      service?.getPosts(getPostsForm);
     } else {
       let getCommentsForm: GetCommentsForm = {
         page: state.page,
@@ -117,7 +117,7 @@ const Home: React.FC<MainProps> = (props) => {
         sort: SortType[state.sort],
         type_: ListingType[state.listingType],
       };
-      service.getComments(getCommentsForm);
+      service?.getComments(getCommentsForm);
     }
   };
 

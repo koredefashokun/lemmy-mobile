@@ -1,5 +1,7 @@
 import React from 'react';
 import { ScrollView, ActivityIndicator } from 'react-native';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
@@ -23,6 +25,7 @@ import {
   SearchResponse,
   GetCommunityResponse,
   WebSocketJsonResponse,
+  GetPostForm,
 } from '../interfaces';
 import CommentNodes from './CommentNodes';
 import {
@@ -32,10 +35,9 @@ import {
   createCommentLikeRes,
   createPostLikeRes,
 } from '../utils';
-import { i18n } from '../i18next';
-import useWebSocketService from '../hooks/useWebSocketService';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+// import { i18n } from '../i18next';
+// import useWebSocketService from '../hooks/useWebSocketService';
+import { ServiceContext } from '../contexts/ServiceContext';
 import PostListing from './PostListing';
 import { MainStackParamList } from '../../App';
 
@@ -89,12 +91,12 @@ const Post: React.FC = () => {
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
   );
-  const service = useWebSocketService();
+  const service = React.useContext(ServiceContext);
   const { params } = useRoute<RouteProp<MainStackParamList, 'Post'>>();
 
-  const handleCommentSortChange = (event: any) => {
-    setState({ commentSort: Number(event.target.value) });
-  };
+  // const handleCommentSortChange = (event: any) => {
+  //   setState({ commentSort: Number(event.target.value) });
+  // };
 
   const buildCommentsTree = (): Array<CommentNodeI> => {
     let map = new Map<number, CommentNodeI>();
@@ -151,7 +153,7 @@ const Post: React.FC = () => {
       // toast(i18n.t(msg.error), "danger");
       return;
     } else if (msg.reconnect) {
-      service.getPost({ id: params.postId });
+      service?.getPost({ id: params.postId });
     } else if (res.op === UserOperation.GetPost) {
       let data = res.data as GetPostResponse;
 
@@ -176,7 +178,7 @@ const Post: React.FC = () => {
           page: 1,
           limit: 6,
         };
-        service.search(form);
+        service?.search(form);
       }
     } else if (res.op === UserOperation.CreateComment) {
       let data = res.data as CommentResponse;
@@ -283,11 +285,11 @@ const Post: React.FC = () => {
 
     let form: GetPostForm = { id: params.postId };
 
-    service.getPost(form);
-    service.getSite();
+    service?.getPost(form);
+    service?.getSite();
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
