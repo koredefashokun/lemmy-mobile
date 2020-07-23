@@ -1,70 +1,80 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-
-import Login from './src/screens/Login';
-import Register from './src/screens/Register';
 import Home from './src/screens/Home';
 import Post from './src/components/Post';
 
-import { AuthProvider, AuthContext } from './src/contexts/AuthContext';
+import { colors } from './src/styles/theme';
+
 import { ServiceProvider } from './src/contexts/ServiceContext';
+import { SitesProvider, SitesContext } from './src/contexts/SitesContext';
+import { Feather } from '@expo/vector-icons';
+import NoSite from './src/screens/NoSite';
+import SiteSetup from './src/screens/SiteSetup';
+import SiteSelector from './src/screens/SiteSelector';
 
 const AppStack = createStackNavigator();
-const AuthStack = createStackNavigator();
-const MainStack = createStackNavigator<MainStackParamList>();
+const SiteStack = createStackNavigator<SiteStackParamList>();
 
-const AuthNavigator = () => {
-  return (
-    <AuthStack.Navigator headerMode='none'>
-      <AuthStack.Screen name='Login' component={Login} />
-      <AuthStack.Screen name='Register' component={Register} />
-    </AuthStack.Navigator>
-  );
-};
-
-export type MainStackParamList = {
+export type SiteStackParamList = {
   Home: undefined;
   Post: { postId: number };
 };
 
-const MainNavigator = () => {
+const SiteNavigator = () => {
   return (
-    <MainStack.Navigator headerMode='none'>
-      <MainStack.Screen name='Home' component={Home} />
-      <MainStack.Screen name='Post' component={Post} />
-    </MainStack.Navigator>
+    <SiteStack.Navigator>
+      <SiteStack.Screen
+        name='Home'
+        component={Home}
+        options={({ navigation }) => ({
+          headerStyle: {
+            backgroundColor: '#222222',
+            shadowColor: '#999999',
+          },
+          headerTitle: '',
+          headerLeftContainerStyle: {
+            paddingLeft: 8,
+          },
+        })}
+      />
+      <SiteStack.Screen name='Post' component={Post} />
+    </SiteStack.Navigator>
   );
 };
 
 const AppNavigator = () => {
-  const { jwt } = React.useContext(AuthContext);
+  const { activeSite } = React.useContext(SitesContext);
 
   return (
     <AppStack.Navigator
       headerMode='none'
-      initialRouteName={jwt ? 'Main' : 'Auth'}
+      initialRouteName={activeSite ? 'Site' : 'NoSite'}
+      mode='modal'
     >
-      <AppStack.Screen name='Auth' component={AuthNavigator} />
-      <AppStack.Screen name='Main' component={MainNavigator} />
+      <AppStack.Screen name='NoSite' component={NoSite} />
+      <AppStack.Screen name='Site' component={SiteNavigator} />
+      <AppStack.Screen name='SiteSetup' component={SiteSetup} />
+      <AppStack.Screen name='SiteSelector' component={SiteSelector} />
     </AppStack.Navigator>
   );
 };
 
 const App = () => {
   return (
-    <AuthProvider>
+    <SitesProvider>
+      <StatusBar style='light' />
       <ServiceProvider>
-        <StatusBar style='light' />
         <SafeAreaProvider>
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
         </SafeAreaProvider>
       </ServiceProvider>
-    </AuthProvider>
+    </SitesProvider>
   );
 };
 

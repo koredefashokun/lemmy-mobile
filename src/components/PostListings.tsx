@@ -1,12 +1,20 @@
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Post } from "../interfaces";
-import { postSort } from "../utils";
-import { View, Text, FlatList } from "react-native";
-import { i18n } from "../i18next";
-import PostListing from "./PostListing";
+import React from 'react';
+import { Post, SortType } from '../interfaces';
+import { postSort } from '../utils';
+import { View, Text, FlatList } from 'react-native';
+import { i18n } from '../i18next';
+import PostListing from './PostListing';
 
-const PostListings = (props) => {
+interface PostListingsProps {
+  posts: Array<Post>;
+  showCommunity?: boolean;
+  removeDuplicates?: boolean;
+  sort?: SortType;
+  enableDownvotes: boolean;
+  enableNsfw: boolean;
+}
+
+const PostListings: React.FC<PostListingsProps> = (props) => {
   const outer = (): Array<Post> => {
     let out = props.posts;
     if (props.removeDuplicates) {
@@ -72,7 +80,7 @@ const PostListings = (props) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#222222" }}>
+    <View style={{ flex: 1, backgroundColor: '#222222' }}>
       {props.posts.length > 0 ? (
         <FlatList
           showsVerticalScrollIndicator={false}
@@ -90,7 +98,7 @@ const PostListings = (props) => {
         />
       ) : (
         <>
-          <Text>{i18n.t("no_posts")}</Text>
+          <Text>{i18n.t('no_posts')}</Text>
           {props.showCommunity !== undefined && (
             // <T i18nKey="subscribe_to_communities">
             //   #<Link to="/communities">#</Link>
@@ -99,7 +107,7 @@ const PostListings = (props) => {
           )}
         </>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

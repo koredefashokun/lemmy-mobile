@@ -1,4 +1,6 @@
 import React from 'react';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   wsJsonToRes,
@@ -34,6 +36,8 @@ import { UserService } from '../services';
 import CommentNodes from '../components/CommentNodes';
 import PostListings from '../components/PostListings';
 import { ServiceContext } from '../contexts/ServiceContext';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../styles/theme';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -49,7 +53,7 @@ interface MainState {
   page: number;
 }
 
-const Home: React.FC<MainProps> = (props) => {
+const Home: React.FC = (props) => {
   const initialState: MainState = {
     subscribedCommunities: [],
     trendingCommunities: [],
@@ -86,6 +90,30 @@ const Home: React.FC<MainProps> = (props) => {
     (p: typeof initialState, n: typeof initialState) => ({ ...p, ...n }),
     initialState
   );
+
+  const navigation = useNavigation();
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => {
+            console.log('Pressing...');
+            navigation.navigate('SiteSelector');
+          }}
+        >
+          <Feather name='menu' color={colors.green} size={28} />
+        </TouchableOpacity>
+      ),
+    });
+  }, []);
+
   const service = React.useContext(ServiceContext);
 
   React.useEffect(() => {

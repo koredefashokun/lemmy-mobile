@@ -1,7 +1,7 @@
-import React from 'react';
-import { AppLoading } from 'expo';
-import AsyncStorage from '@react-native-community/async-storage';
-import { User } from '../interfaces';
+import React from "react";
+import { AppLoading } from "expo";
+import AsyncStorage from "@react-native-community/async-storage";
+import { User } from "../interfaces";
 
 export interface Site {
   wsUri: string;
@@ -11,6 +11,7 @@ export interface Site {
 }
 
 interface SiteContextValue {
+  loading: boolean;
   sites: Site[];
   activeSite: Site | undefined;
   setActiveSite(site: Site): void;
@@ -19,6 +20,7 @@ interface SiteContextValue {
 }
 
 export const SitesContext = React.createContext<SiteContextValue>({
+  loading: true,
   sites: [],
   activeSite: undefined,
   setActiveSite: () => {},
@@ -32,7 +34,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   const [activeSite, setActiveSite] = React.useState<Site | undefined>();
 
   const setDefaultSite = async () => {
-    const savedSites = await AsyncStorage.getItem('sites');
+    const savedSites = await AsyncStorage.getItem("sites");
     if (savedSites) {
       const parsedSites = JSON.parse(savedSites);
       setActiveSite(parsedSites[0]);
@@ -40,7 +42,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   };
 
   const loadActiveSite = async () => {
-    const savedActiveSite = await AsyncStorage.getItem('activeSite');
+    const savedActiveSite = await AsyncStorage.getItem("activeSite");
     if (savedActiveSite) {
       const parsedActiveSite = JSON.parse(savedActiveSite);
       setActiveSite(parsedActiveSite);
@@ -50,7 +52,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   };
 
   const loadSites = async () => {
-    const savedSites = await AsyncStorage.getItem('sites');
+    const savedSites = await AsyncStorage.getItem("sites");
     if (savedSites) {
       const parsedSites = JSON.parse(savedSites);
       setSites(parsedSites);
@@ -60,26 +62,25 @@ export const SitesProvider: React.FC = ({ children }) => {
   };
 
   React.useEffect(() => {
-    loadActiveSite();
-    loadSites();
-    setLoading(false);
+    (async () => {
+      await Promise.all([loadActiveSite, loadSites]);
+      setLoading(false);
+    })();
   }, []);
 
   React.useEffect(() => {
     if (activeSite) {
-      AsyncStorage.setItem('activeSite', JSON.stringify(activeSite));
+      AsyncStorage.setItem("activeSite", JSON.stringify(activeSite));
     } else {
       setDefaultSite();
     }
   }, [activeSite]);
 
   React.useEffect(() => {
-    AsyncStorage.setItem('sites', JSON.stringify(sites));
+    AsyncStorage.setItem("sites", JSON.stringify(sites));
   }, [sites]);
 
-  const addSite = (site: Site) => {
-    setSites([...sites, site]);
-  };
+  const addSite = (site: Site) => setSites([...sites, site]);
 
   const removeSite = (wsUri: string) => {
     setSites(sites.filter((site) => site.wsUri !== wsUri));
@@ -87,7 +88,7 @@ export const SitesProvider: React.FC = ({ children }) => {
 
   return (
     <SitesContext.Provider
-      value={{ sites, activeSite, setActiveSite, addSite, removeSite }}
+      value={{ loading, sites, activeSite, setActiveSite, addSite, removeSite }}
     >
       {loading ? <AppLoading /> : children}
     </SitesContext.Provider>

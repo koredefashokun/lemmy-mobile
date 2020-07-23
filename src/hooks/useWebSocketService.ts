@@ -1,9 +1,8 @@
-import React from 'react';
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
-import { AuthContext } from '../contexts/AuthContext';
-import { wsUri } from '../env';
+import React from "react";
+import ReconnectingWebSocket from "reconnecting-websocket";
+import { Observable } from "rxjs";
+import { share } from "rxjs/operators";
+import { wsUri } from "../env";
 import {
   UserJoinForm,
   UserOperation,
@@ -47,14 +46,20 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
-} from '../interfaces';
-import { UserService } from '../services';
+} from "../interfaces";
+import { SitesContext } from "../contexts/SitesContext";
 
 const useWebSocketService = () => {
   const [firstConnect, setFirstConnect] = React.useState(true);
-  const { jwt, loading } = React.useContext(AuthContext);
+  const { activeSite, loading } = React.useContext(SitesContext);
 
-  const ws = React.useMemo(() => new ReconnectingWebSocket(wsUri), [wsUri]);
+  if (!activeSite) {
+    return;
+  }
+
+  const ws = React.useMemo(() => new ReconnectingWebSocket(activeSite.wsUri), [
+    activeSite.wsUri,
+  ]);
 
   const wsSendWrapper = (op: UserOperation, data: MessageType) => {
     let send = { op: UserOperation[op], data };
@@ -63,10 +68,10 @@ const useWebSocketService = () => {
   };
 
   const setAuth = (obj: any, throwErr: boolean = true) => {
-    if (jwt === null && !loading && throwErr) {
-      throw 'Not logged in';
+    if (!activeSite?.jwt && !loading && throwErr) {
+      throw "Not logged in";
     }
-    obj.auth = jwt;
+    obj.auth = activeSite.jwt;
   };
 
   const subject: Observable<any> = React.useMemo(
@@ -78,7 +83,7 @@ const useWebSocketService = () => {
         ws.onopen = () => {
           console.log(`Connected to ${wsUri}`);
 
-          if (!loading && jwt) {
+          if (!loading && activeSite.jwt) {
             WebSocketService.userJoin();
           }
 
@@ -92,15 +97,15 @@ const useWebSocketService = () => {
           setFirstConnect(false);
         };
       }).pipe(share()),
-    [ws, wsUri, loading, jwt, firstConnect]
+    [ws, wsUri, loading, activeSite.jwt, firstConnect]
   );
 
   const WebSocketService = {
     subject,
     userJoin: () => {
       if (loading) return;
-      if (!jwt) throw new Error('');
-      let form: UserJoinForm = { auth: jwt };
+      if (!activeSite?.jwt) throw new Error("");
+      let form: UserJoinForm = { auth: activeSite.jwt };
       ws.send(wsSendWrapper(UserOperation.UserJoin, form));
     },
 
@@ -135,8 +140,8 @@ const useWebSocketService = () => {
     },
 
     getFollowedCommunities: () => {
-      if (!jwt) throw new Error('sdfdf');
-      let form: GetFollowedCommunitiesForm = { auth: jwt };
+      if (!activeSite.jwt) throw new Error("Not authenticated");
+      let form: GetFollowedCommunitiesForm = { auth: activeSite.jwt };
       ws.send(wsSendWrapper(UserOperation.GetFollowedCommunities, form));
     },
 
