@@ -13,11 +13,9 @@ const SiteSetup: React.FC = () => {
   const { goBack } = useNavigation();
 
   const handleSubmit = () => {
-    // This might have to become async, (see comment below).
-    addSite({
-      wsUri: siteUrl,
-      name: "Site name", // TODO: Make this get the actual name of the site (preferrably without a request to the site's server).
-    });
+    // TODO: Make this get the actual name of the site (preferrably without a request to the site's server).
+    // If getting the site's name is not possible without setting the site as the active site, this might have to become async.
+    addSite({ wsUri: siteUrl, name: "Lemmy" });
     goBack();
   };
 
@@ -28,9 +26,11 @@ const SiteSetup: React.FC = () => {
         <Text style={authStyles.label}>Site URL</Text>
         <TextInput
           style={authStyles.input}
-          placeholder="https://dev.lemmy.ml/api/ws/v1"
+          placeholder="wss://dev.lemmy.ml/api/ws/v1"
           placeholderTextColor={colors.gray}
           onChangeText={setSiteUrl}
+          autoCorrect={false}
+          autoCapitalize="none"
         />
       </View>
       <TouchableOpacity onPress={handleSubmit} style={authStyles.button}>

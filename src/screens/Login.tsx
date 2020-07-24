@@ -18,7 +18,7 @@ import { i18n } from "../i18next";
 import authStyles from "../styles/auth";
 import { AuthContext } from "../contexts/AuthContext";
 import { colors } from "../styles/theme";
-import { ServiceContext } from "../contexts/ServiceContext";
+import { SitesContext } from "../contexts/SitesContext";
 
 const initialState = {
   username_or_email: undefined,
@@ -31,7 +31,7 @@ const Login: React.FC = () => {
     initialState
   );
   const [loading, setLoading] = React.useState(false);
-  const service = React.useContext(ServiceContext);
+  const { service } = React.useContext(SitesContext);
   const { setJwt } = React.useContext(AuthContext);
 
   const parseMessage = (msg: WebSocketJsonResponse) => {

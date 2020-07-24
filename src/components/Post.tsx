@@ -1,8 +1,8 @@
-import React from 'react';
-import { ScrollView, ActivityIndicator } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { retryWhen, delay, take } from 'rxjs/operators';
+import React from "react";
+import { ScrollView, ActivityIndicator } from "react-native";
+import { useRoute, RouteProp } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { retryWhen, delay, take } from "rxjs/operators";
 import {
   CommentNode as CommentNodeI,
   Post as PostI,
@@ -26,20 +26,20 @@ import {
   GetCommunityResponse,
   WebSocketJsonResponse,
   GetPostForm,
-} from '../interfaces';
-import CommentNodes from './CommentNodes';
+} from "../interfaces";
+import CommentNodes from "./CommentNodes";
 import {
   wsJsonToRes,
   editCommentRes,
   saveCommentRes,
   createCommentLikeRes,
   createPostLikeRes,
-} from '../utils';
+} from "../utils";
 // import { i18n } from '../i18next';
 // import useWebSocketService from '../hooks/useWebSocketService';
-import { ServiceContext } from '../contexts/ServiceContext';
-import PostListing from './PostListing';
-import { MainStackParamList } from '../../App';
+import { SitesContext } from "../contexts/SitesContext";
+import PostListing from "./PostListing";
+import { MainStackParamList } from "../../App";
 
 interface PostState {
   post: PostI | null;
@@ -91,8 +91,8 @@ const Post: React.FC = () => {
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
   );
-  const service = React.useContext(ServiceContext);
-  const { params } = useRoute<RouteProp<MainStackParamList, 'Post'>>();
+  const { service } = React.useContext(SitesContext);
+  const { params } = useRoute<RouteProp<MainStackParamList, "Post">>();
 
   // const handleCommentSortChange = (event: any) => {
   //   setState({ commentSort: Number(event.target.value) });
@@ -281,7 +281,7 @@ const Post: React.FC = () => {
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log('complete'));
+      .subscribe(parseMessage, console.error, () => console.log("complete"));
 
     let form: GetPostForm = { id: params.postId };
 
@@ -294,7 +294,7 @@ const Post: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#222222' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#222222" }}>
       {state.loading ? (
         <ActivityIndicator />
       ) : (

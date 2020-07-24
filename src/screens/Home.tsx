@@ -1,7 +1,7 @@
-import React from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Feather } from '@expo/vector-icons';
-import { retryWhen, delay, take } from 'rxjs/operators';
+import React from "react";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Feather } from "@expo/vector-icons";
+import { retryWhen, delay, take } from "rxjs/operators";
 import {
   wsJsonToRes,
   editPostFindRes,
@@ -10,7 +10,7 @@ import {
   getPageFromProps,
   fetchLimit,
   commentsToFlatNodes,
-} from '../utils';
+} from "../utils";
 // import { i18n } from "../i18next";
 import {
   UserOperation,
@@ -31,13 +31,13 @@ import {
   SortType,
   GetPostsForm,
   GetCommentsForm,
-} from '../interfaces';
-import { UserService } from '../services';
-import CommentNodes from '../components/CommentNodes';
-import PostListings from '../components/PostListings';
-import { ServiceContext } from '../contexts/ServiceContext';
-import { useNavigation } from '@react-navigation/native';
-import { colors } from '../styles/theme';
+} from "../interfaces";
+import { UserService } from "../services";
+import CommentNodes from "../components/CommentNodes";
+import PostListings from "../components/PostListings";
+import { SitesContext } from "../contexts/SitesContext";
+import { useNavigation } from "@react-navigation/native";
+import { colors } from "../styles/theme";
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -98,28 +98,28 @@ const Home: React.FC = (props) => {
       headerLeft: () => (
         <TouchableOpacity
           style={{
-            height: '100%',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
+            height: "100%",
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
           }}
           onPress={() => {
-            console.log('Pressing...');
-            navigation.navigate('SiteSelector');
+            console.log("Pressing...");
+            navigation.navigate("SiteSelector");
           }}
         >
-          <Feather name='menu' color={colors.green} size={28} />
+          <Feather name="menu" color={colors.green} size={28} />
         </TouchableOpacity>
       ),
     });
   }, []);
 
-  const service = React.useContext(ServiceContext);
+  const { service } = React.useContext(SitesContext);
 
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log('complete'));
+      .subscribe(parseMessage, console.error, () => console.log("complete"));
 
     service?.getFollowedCommunities();
     fetchData();
