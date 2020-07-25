@@ -1,7 +1,7 @@
-import React from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Feather } from "@expo/vector-icons";
-import { retryWhen, delay, take } from "rxjs/operators";
+import React from 'react';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   wsJsonToRes,
   editPostFindRes,
@@ -9,8 +9,8 @@ import {
   getDataTypeFromProps,
   getPageFromProps,
   fetchLimit,
-  commentsToFlatNodes,
-} from "../utils";
+  commentsToFlatNodes
+} from '../utils';
 // import { i18n } from "../i18next";
 import {
   UserOperation,
@@ -30,14 +30,14 @@ import {
   DataType,
   SortType,
   GetPostsForm,
-  GetCommentsForm,
-} from "../interfaces";
-import { UserService } from "../services";
-import CommentNodes from "../components/CommentNodes";
-import PostListings from "../components/PostListings";
-import { SitesContext } from "../contexts/SitesContext";
-import { useNavigation } from "@react-navigation/native";
-import { colors } from "../styles/theme";
+  GetCommentsForm
+} from '../interfaces';
+import CommentNodes from '../components/CommentNodes';
+import PostListings from '../components/PostListings';
+import { SitesContext } from '../contexts/SitesContext';
+import { useNavigation } from '@react-navigation/native';
+import { colors } from '../styles/theme';
+import { AuthContext } from '../contexts/AuthContext';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -70,11 +70,11 @@ const Home: React.FC = (props) => {
         number_of_communities: null,
         enable_downvotes: null,
         open_registration: null,
-        enable_nsfw: null,
+        enable_nsfw: null
       },
       admins: [],
       banned: [],
-      online: null,
+      online: null
     },
     showEditSite: false,
     loading: true,
@@ -83,7 +83,7 @@ const Home: React.FC = (props) => {
     listingType: ListingType.All,
     dataType: getDataTypeFromProps(props),
     sort: SortType.TopAll,
-    page: getPageFromProps(props),
+    page: getPageFromProps(props)
   };
 
   const [state, setState] = React.useReducer(
@@ -98,28 +98,28 @@ const Home: React.FC = (props) => {
       headerLeft: () => (
         <TouchableOpacity
           style={{
-            height: "100%",
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center'
           }}
           onPress={() => {
-            console.log("Pressing...");
-            navigation.navigate("SiteSelector");
+            navigation.navigate('SiteSelector');
           }}
         >
-          <Feather name="menu" color={colors.green} size={28} />
+          <Feather name='menu' color={colors.green} size={28} />
         </TouchableOpacity>
-      ),
+      )
     });
   }, []);
 
   const { service } = React.useContext(SitesContext);
+  const { user } = React.useContext(AuthContext);
 
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log("complete"));
+      .subscribe(parseMessage, console.error, () => console.log('complete'));
 
     service?.getFollowedCommunities();
     fetchData();
@@ -135,7 +135,7 @@ const Home: React.FC = (props) => {
         page: state.page,
         limit: fetchLimit,
         sort: SortType[state.sort],
-        type_: ListingType[state.listingType],
+        type_: ListingType[state.listingType]
       };
       service?.getPosts(getPostsForm);
     } else {
@@ -143,7 +143,7 @@ const Home: React.FC = (props) => {
         page: state.page,
         limit: fetchLimit,
         sort: SortType[state.sort],
-        type_: ListingType[state.listingType],
+        type_: ListingType[state.listingType]
       };
       service?.getComments(getCommentsForm);
     }
@@ -206,12 +206,7 @@ const Home: React.FC = (props) => {
         let nsfw = data.post.nsfw || data.post.community_nsfw;
 
         // Don't push the post if its nsfw, and don't have that setting on
-        if (
-          !nsfw ||
-          (nsfw &&
-            UserService.Instance.user &&
-            UserService.Instance.user.show_nsfw)
-        ) {
+        if (!nsfw || (nsfw && user && user.show_nsfw)) {
           state.posts.unshift(data.post);
         }
       }

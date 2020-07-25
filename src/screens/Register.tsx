@@ -8,10 +8,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { retryWhen, delay, take } from 'rxjs/operators';
-import { WebSocketService, UserService } from '../services';
 import { WebSocketJsonResponse, LoginResponse } from '../interfaces';
 import { wsJsonToRes } from '../utils';
 import { i18n } from '../i18next';
+import { SitesContext } from '../contexts/SitesContext';
+import { AuthContext } from '../contexts/AuthContext';
 
 const initialState = {
   username: undefined,
@@ -29,6 +30,9 @@ const Login = (props: any) => {
   const [loading, setLoading] = React.useState(false);
   const [answer, setAnswer] = React.useState<string>('');
 
+  const { service } = React.useContext(SitesContext);
+  const { setJwt } = React.useContext(AuthContext);
+
   const mathQuestion = {
     a: Math.floor(Math.random() * 10) + 1,
     b: Math.floor(Math.random() * 10) + 1,
@@ -45,15 +49,15 @@ const Login = (props: any) => {
     } else {
       let data = res.data as LoginResponse;
       setState(initialState);
-      UserService.Instance.login(data);
-      WebSocketService.Instance.userJoin();
+      setJwt(data.jwt);
+      service?.userJoin();
       // toast(i18n.t('logged_in'));
       props.history.push('/');
     }
   };
 
   React.useEffect(() => {
-    const subscription = WebSocketService.Instance.subject
+    const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
       .subscribe(
         parseMessage,
@@ -62,13 +66,13 @@ const Login = (props: any) => {
       );
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, []);
 
   const handleLoginSubmit = () => {
     setLoading(true);
-    WebSocketService.Instance.login(state);
+    service?.login(state);
   };
 
   return (

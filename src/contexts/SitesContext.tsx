@@ -1,9 +1,9 @@
-import React from "react";
-import { AppLoading } from "expo";
-import AsyncStorage from "@react-native-community/async-storage";
-import useWebSocketService from "../hooks/useWebSocketService";
+import React from 'react';
+import { AppLoading } from 'expo';
+import AsyncStorage from '@react-native-community/async-storage';
+import useWebSocketService from '../hooks/useWebSocketService';
 
-interface Site {
+export interface Site {
   wsUri: string;
   name: string;
 }
@@ -31,10 +31,10 @@ export const SitesProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = React.useState(true);
   const [sites, setSites] = React.useState<Site[]>([]);
   const [activeSite, setActiveSite] = React.useState<Site | undefined>();
-  const service = useWebSocketService();
+  const service = useWebSocketService({ activeSite, loading });
 
   const setDefaultSite = async () => {
-    const savedSites = await AsyncStorage.getItem("sites");
+    const savedSites = await AsyncStorage.getItem('sites');
     if (savedSites) {
       const parsedSites = JSON.parse(savedSites);
       setActiveSite(parsedSites[0]);
@@ -42,7 +42,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   };
 
   const loadActiveSite = async () => {
-    const savedActiveSite = await AsyncStorage.getItem("activeSite");
+    const savedActiveSite = await AsyncStorage.getItem('activeSite');
     if (savedActiveSite) {
       const parsedActiveSite = JSON.parse(savedActiveSite);
       setActiveSite(parsedActiveSite);
@@ -52,7 +52,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   };
 
   const loadSites = async () => {
-    const savedSites = await AsyncStorage.getItem("sites");
+    const savedSites = await AsyncStorage.getItem('sites');
     if (savedSites) {
       const parsedSites = JSON.parse(savedSites);
       setSites(parsedSites);
@@ -70,14 +70,14 @@ export const SitesProvider: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     if (activeSite) {
-      AsyncStorage.setItem("activeSite", JSON.stringify(activeSite));
+      AsyncStorage.setItem('activeSite', JSON.stringify(activeSite));
     } else {
       setDefaultSite();
     }
   }, [activeSite]);
 
   React.useEffect(() => {
-    AsyncStorage.setItem("sites", JSON.stringify(sites));
+    AsyncStorage.setItem('sites', JSON.stringify(sites));
   }, [sites]);
 
   const addSite = (site: Site) => setSites([...sites, site]);

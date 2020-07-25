@@ -1,10 +1,11 @@
-import React from "react";
-import AsyncStorage from "@react-native-community/async-storage";
-import { AppLoading } from "expo";
-import { User } from "../interfaces";
+import React from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import { AppLoading } from 'expo';
+import jwt_decode from 'jwt-decode';
+import { User } from '../interfaces';
 
 interface AuthContextValue {
-  jwt: string | null;
+  jwt?: string;
   setJwt(jwt: string): void;
   user?: User;
   setUser(user: User): void;
@@ -12,7 +13,6 @@ interface AuthContextValue {
 }
 
 export const AuthContext = React.createContext<AuthContextValue>({
-  jwt: null,
   setJwt: () => {},
   setUser: () => {},
   loading: true,
@@ -21,31 +21,27 @@ export const AuthContext = React.createContext<AuthContextValue>({
 export const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = React.useState(true);
   const [user, setUser] = React.useState<User | undefined>();
-  const [jwt, setJwt] = React.useState<string | null>(null);
+  const [jwt, setJwt] = React.useState<string | undefined>();
 
   React.useEffect(() => {
     (async () => {
-      const savedToken = await AsyncStorage.getItem("jwt");
-      if (savedToken) setJwt(savedToken);
+      const savedToken = await AsyncStorage.getItem('jwt');
+      if (savedToken) {
+        setJwt(savedToken);
+      }
       setLoading(false);
     })();
   }, []);
 
   React.useEffect(() => {
     if (!jwt) {
-      AsyncStorage.removeItem("jwt");
+      AsyncStorage.removeItem('jwt');
+      AsyncStorage.removeItem('user');
     } else {
-      AsyncStorage.setItem("jwt", jwt);
+      AsyncStorage.setItem('jwt', jwt);
+      AsyncStorage.setItem('user', JSON.stringify(jwt_decode(jwt)));
     }
   }, [jwt]);
-
-  React.useEffect(() => {
-    if (!user) {
-      AsyncStorage.removeItem("user");
-    } else {
-      AsyncStorage.setItem("user", JSON.stringify(user));
-    }
-  }, [user]);
 
   return (
     <AuthContext.Provider value={{ jwt, setJwt, user, setUser, loading }}>

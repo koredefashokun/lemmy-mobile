@@ -1,7 +1,7 @@
-import React from "react";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import { Observable } from "rxjs";
-import { share } from "rxjs/operators";
+import React from 'react';
+import ReconnectingWebSocket from 'reconnecting-websocket';
+import { Observable } from 'rxjs';
+import { share } from 'rxjs/operators';
 import {
   UserJoinForm,
   UserOperation,
@@ -45,13 +45,18 @@ import {
   SiteConfigForm,
   MessageType,
   WebSocketJsonResponse,
-} from "../interfaces";
-import { SitesContext } from "../contexts/SitesContext";
-import { AuthContext } from "../contexts/AuthContext";
+} from '../interfaces';
+import { Site } from '../contexts/SitesContext';
+import { AuthContext } from '../contexts/AuthContext';
 
-function useWebSocketService() {
+const useWebSocketService = ({
+  activeSite,
+  loading,
+}: {
+  activeSite?: Site;
+  loading: boolean;
+}) => {
   const [firstConnect, setFirstConnect] = React.useState(true);
-  const { activeSite, loading } = React.useContext(SitesContext);
   const { jwt } = React.useContext(AuthContext);
 
   if (!activeSite) return undefined;
@@ -68,7 +73,7 @@ function useWebSocketService() {
 
   const setAuth = (obj: any, throwErr: boolean = true) => {
     if (!jwt && !loading && throwErr) {
-      throw "Not logged in";
+      throw 'Not logged in';
     }
     obj.auth = jwt;
   };
@@ -103,7 +108,7 @@ function useWebSocketService() {
     subject,
     userJoin: () => {
       if (loading) return;
-      if (!jwt) throw new Error("");
+      if (!jwt) throw new Error('');
       let form: UserJoinForm = { auth: jwt };
       ws.send(wsSendWrapper(UserOperation.UserJoin, form));
     },
@@ -139,7 +144,7 @@ function useWebSocketService() {
     },
 
     getFollowedCommunities: () => {
-      if (!jwt) throw new Error("Not authenticated");
+      if (!jwt) throw new Error('Not authenticated');
       let form: GetFollowedCommunitiesForm = { auth: jwt };
       ws.send(wsSendWrapper(UserOperation.GetFollowedCommunities, form));
     },
@@ -333,6 +338,6 @@ function useWebSocketService() {
   };
 
   return WebSocketService;
-}
+};
 
 export default useWebSocketService;
