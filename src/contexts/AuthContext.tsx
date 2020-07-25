@@ -15,7 +15,7 @@ interface AuthContextValue {
 export const AuthContext = React.createContext<AuthContextValue>({
   setJwt: () => {},
   setUser: () => {},
-  loading: true,
+  loading: true
 });
 
 export const AuthProvider: React.FC = ({ children }) => {
@@ -34,12 +34,13 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   React.useEffect(() => {
-    if (!jwt) {
-      AsyncStorage.removeItem('jwt');
-      AsyncStorage.removeItem('user');
+    if (jwt) {
+      AsyncStorage.multiSet([
+        ['jwt', jwt],
+        ['user', JSON.stringify(jwt_decode(jwt))]
+      ]);
     } else {
-      AsyncStorage.setItem('jwt', jwt);
-      AsyncStorage.setItem('user', JSON.stringify(jwt_decode(jwt)));
+      AsyncStorage.multiRemove(['jwt', 'user']);
     }
   }, [jwt]);
 
