@@ -92,28 +92,6 @@ const Home: React.FC = (props) => {
     initialState
   );
 
-  const navigation = useNavigation();
-
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          style={{
-            height: '100%',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-          onPress={() => {
-            navigation.navigate('SiteSelector');
-          }}
-        >
-          <Feather name='menu' color={colors.green} size={28} />
-        </TouchableOpacity>
-      )
-    });
-  }, []);
-
   const { activeSite } = React.useContext(SitesContext);
   const service = useWebSocketService({ activeSite, loading: false });
   const { user } = React.useContext(AuthContext);

@@ -1,7 +1,6 @@
 import React from 'react';
-import { ScrollView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
@@ -296,7 +295,7 @@ const Post: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#222222' }}>
+    <View style={{ flex: 1, backgroundColor: '#222222' }}>
       {state.loading ? (
         <ActivityIndicator />
       ) : (
@@ -311,7 +310,7 @@ const Post: React.FC = () => {
           {commentsTree()}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
