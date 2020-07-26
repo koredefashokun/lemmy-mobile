@@ -38,6 +38,7 @@ import { SitesContext } from '../contexts/SitesContext';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../styles/theme';
 import { AuthContext } from '../contexts/AuthContext';
+import useWebSocketService from '../hooks/useWebSocketService';
 
 interface MainState {
   subscribedCommunities: Array<CommunityUser>;
@@ -113,7 +114,8 @@ const Home: React.FC = (props) => {
     });
   }, []);
 
-  const { service } = React.useContext(SitesContext);
+  const { activeSite } = React.useContext(SitesContext);
+  const service = useWebSocketService({ activeSite, loading: false });
   const { user } = React.useContext(AuthContext);
 
   React.useEffect(() => {

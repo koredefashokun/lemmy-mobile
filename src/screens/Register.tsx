@@ -5,7 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
+  ActivityIndicator
 } from 'react-native';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import { WebSocketJsonResponse, LoginResponse } from '../interfaces';
@@ -13,13 +13,14 @@ import { wsJsonToRes } from '../utils';
 import { i18n } from '../i18next';
 import { SitesContext } from '../contexts/SitesContext';
 import { AuthContext } from '../contexts/AuthContext';
+import useWebSocketService from '../hooks/useWebSocketService';
 
 const initialState = {
   username: undefined,
   password: undefined,
   password_verify: undefined,
   admin: false,
-  show_nsfw: false,
+  show_nsfw: false
 };
 
 const Login = (props: any) => {
@@ -30,12 +31,13 @@ const Login = (props: any) => {
   const [loading, setLoading] = React.useState(false);
   const [answer, setAnswer] = React.useState<string>('');
 
-  const { service } = React.useContext(SitesContext);
+  const { activeSite } = React.useContext(SitesContext);
+  const service = useWebSocketService({ activeSite, loading: false });
   const { setJwt } = React.useContext(AuthContext);
 
   const mathQuestion = {
     a: Math.floor(Math.random() * 10) + 1,
-    b: Math.floor(Math.random() * 10) + 1,
+    b: Math.floor(Math.random() * 10) + 1
   };
 
   const mathCheck = Number(answer) !== mathQuestion.a + mathQuestion.b;
@@ -112,10 +114,10 @@ const Login = (props: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   input: {},
-  button: {},
+  button: {}
 });
 
 export default Login;

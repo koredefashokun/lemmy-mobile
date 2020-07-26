@@ -44,25 +44,28 @@ import {
   GetPrivateMessagesForm,
   SiteConfigForm,
   MessageType,
-  WebSocketJsonResponse,
+  WebSocketJsonResponse
 } from '../interfaces';
 import { Site } from '../contexts/SitesContext';
 import { AuthContext } from '../contexts/AuthContext';
 
 const useWebSocketService = ({
   activeSite,
-  loading,
+  loading
 }: {
-  activeSite?: Site;
+  activeSite: Site;
   loading: boolean;
 }) => {
   const [firstConnect, setFirstConnect] = React.useState(true);
   const { jwt } = React.useContext(AuthContext);
 
-  if (!activeSite) return undefined;
+  // This is causing issues, as the hooks below are being called conditionally.
+  // Is there a way to make sure that the activeSite is valid before calling the hook?
+  // This is the first attempt:
+  // if (!activeSite) return undefined;
 
   const ws = React.useMemo(() => new ReconnectingWebSocket(activeSite.wsUri), [
-    activeSite.wsUri,
+    activeSite.wsUri
   ]);
 
   const wsSendWrapper = (op: UserOperation, data: MessageType) => {
@@ -93,7 +96,7 @@ const useWebSocketService = ({
 
           if (!firstConnect) {
             let res: WebSocketJsonResponse = {
-              reconnect: true,
+              reconnect: true
             };
             obs.next(res);
           }
@@ -334,7 +337,7 @@ const useWebSocketService = ({
     saveSiteConfig: (form: SiteConfigForm) => {
       setAuth(form);
       ws.send(wsSendWrapper(UserOperation.SaveSiteConfig, form));
-    },
+    }
   };
 
   return WebSocketService;

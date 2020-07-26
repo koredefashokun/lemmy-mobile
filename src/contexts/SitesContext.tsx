@@ -1,7 +1,6 @@
 import React from 'react';
 import { AppLoading } from 'expo';
 import AsyncStorage from '@react-native-community/async-storage';
-import useWebSocketService from '../hooks/useWebSocketService';
 
 export interface Site {
   wsUri: string;
@@ -15,7 +14,6 @@ interface SiteContextValue {
   setActiveSite(site: Site): void;
   addSite(site: Site): void;
   removeSite(wsUri: string): void;
-  service?: ReturnType<typeof useWebSocketService>;
 }
 
 export const SitesContext = React.createContext<SiteContextValue>({
@@ -24,14 +22,13 @@ export const SitesContext = React.createContext<SiteContextValue>({
   activeSite: undefined,
   setActiveSite: () => {},
   addSite: () => {},
-  removeSite: () => {},
+  removeSite: () => {}
 });
 
 export const SitesProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = React.useState(true);
   const [sites, setSites] = React.useState<Site[]>([]);
   const [activeSite, setActiveSite] = React.useState<Site | undefined>();
-  const service = useWebSocketService({ activeSite, loading });
 
   const setDefaultSite = async () => {
     const savedSites = await AsyncStorage.getItem('sites');
@@ -94,8 +91,7 @@ export const SitesProvider: React.FC = ({ children }) => {
         activeSite,
         setActiveSite,
         addSite,
-        removeSite,
-        service,
+        removeSite
       }}
     >
       {loading ? <AppLoading /> : children}

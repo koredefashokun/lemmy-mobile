@@ -1,8 +1,8 @@
-import React from "react";
-import { ScrollView, ActivityIndicator } from "react-native";
-import { useRoute, RouteProp } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { retryWhen, delay, take } from "rxjs/operators";
+import React from 'react';
+import { ScrollView, ActivityIndicator } from 'react-native';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
   Post as PostI,
@@ -25,21 +25,22 @@ import {
   SearchResponse,
   GetCommunityResponse,
   WebSocketJsonResponse,
-  GetPostForm,
-} from "../interfaces";
-import CommentNodes from "./CommentNodes";
+  GetPostForm
+} from '../interfaces';
+import CommentNodes from './CommentNodes';
 import {
   wsJsonToRes,
   editCommentRes,
   saveCommentRes,
   createCommentLikeRes,
-  createPostLikeRes,
-} from "../utils";
+  createPostLikeRes
+} from '../utils';
 // import { i18n } from '../i18next';
 // import useWebSocketService from '../hooks/useWebSocketService';
-import { SitesContext } from "../contexts/SitesContext";
-import PostListing from "./PostListing";
-import { MainStackParamList } from "../../App";
+import { SitesContext } from '../contexts/SitesContext';
+import PostListing from './PostListing';
+import { MainStackParamList } from '../../App';
+import useWebSocketService from '../hooks/useWebSocketService';
 
 interface PostState {
   post: PostI | null;
@@ -80,10 +81,10 @@ const initialState: PostState = {
       number_of_communities: undefined,
       enable_downvotes: undefined,
       open_registration: undefined,
-      enable_nsfw: undefined,
+      enable_nsfw: undefined
     },
-    online: null,
-  },
+    online: null
+  }
 };
 
 const Post: React.FC = () => {
@@ -91,8 +92,9 @@ const Post: React.FC = () => {
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
   );
-  const { service } = React.useContext(SitesContext);
-  const { params } = useRoute<RouteProp<MainStackParamList, "Post">>();
+  const { activeSite } = React.useContext(SitesContext);
+  const service = useWebSocketService({ activeSite, loading: false });
+  const { params } = useRoute<RouteProp<MainStackParamList, 'Post'>>();
 
   // const handleCommentSortChange = (event: any) => {
   //   setState({ commentSort: Number(event.target.value) });
@@ -103,7 +105,7 @@ const Post: React.FC = () => {
     for (let comment of state.comments) {
       let node: CommentNodeI = {
         comment: comment,
-        children: [],
+        children: []
       };
       map.set(comment.id, { ...node });
     }
@@ -167,7 +169,7 @@ const Post: React.FC = () => {
         moderators: data.moderators,
         siteRes: { ...state.siteRes, admins: data.admins },
         online: data.online,
-        loading: false,
+        loading: false
       });
 
       if (post_url) {
@@ -176,7 +178,7 @@ const Post: React.FC = () => {
           type_: SearchType[SearchType.Url],
           sort: SortType[SortType.TopAll],
           page: 1,
-          limit: 6,
+          limit: 6
         };
         service?.search(form);
       }
@@ -217,8 +219,8 @@ const Post: React.FC = () => {
         post: {
           ...state.post,
           community_id: data.community.id,
-          community_name: data.community.name,
-        },
+          community_name: data.community.name
+        }
       });
       setState(state);
     } else if (res.op === UserOperation.FollowCommunity) {
@@ -232,11 +234,11 @@ const Post: React.FC = () => {
       setState({
         comments: state.comments
           .filter((c) => c.creator_id === data.user.id)
-          .forEach((c) => (c.banned_from_community = data.banned)),
+          .forEach((c) => (c.banned_from_community = data.banned))
       });
       if (state.post.creator_id === data.user.id) {
         setState({
-          post: { ...state.post, banned_from_community: data.banned },
+          post: { ...state.post, banned_from_community: data.banned }
         });
       }
     } else if (res.op === UserOperation.AddModToCommunity) {
@@ -247,7 +249,7 @@ const Post: React.FC = () => {
       setState({
         comments: state.comments
           .filter((c) => c.creator_id === data.user.id)
-          .forEach((c) => (c.banned = data.banned)),
+          .forEach((c) => (c.banned = data.banned))
       });
       if (state.post.creator_id === data.user.id) {
         setState({ post: { ...state.post, banned: data.banned } });
@@ -273,7 +275,7 @@ const Post: React.FC = () => {
       setState({
         community: data.community,
         moderators: data.moderators,
-        siteRes: { ...state.siteRes, admins: data.admins },
+        siteRes: { ...state.siteRes, admins: data.admins }
       });
     }
   };
@@ -281,7 +283,7 @@ const Post: React.FC = () => {
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log("complete"));
+      .subscribe(parseMessage, console.error, () => console.log('complete'));
 
     let form: GetPostForm = { id: params.postId };
 
@@ -294,7 +296,7 @@ const Post: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#222222" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#222222' }}>
       {state.loading ? (
         <ActivityIndicator />
       ) : (

@@ -1,28 +1,29 @@
-import React from "react";
+import React from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { retryWhen, delay, take } from "rxjs/operators";
+  ActivityIndicator
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   WebSocketJsonResponse,
   LoginResponse,
-  UserOperation,
-} from "../interfaces";
-import { wsJsonToRes } from "../utils";
-import { i18n } from "../i18next";
-import authStyles from "../styles/auth";
-import { AuthContext } from "../contexts/AuthContext";
-import { colors } from "../styles/theme";
-import { SitesContext } from "../contexts/SitesContext";
+  UserOperation
+} from '../interfaces';
+import { wsJsonToRes } from '../utils';
+import { i18n } from '../i18next';
+import authStyles from '../styles/auth';
+import { AuthContext } from '../contexts/AuthContext';
+import { colors } from '../styles/theme';
+import { SitesContext } from '../contexts/SitesContext';
+import useWebSocketService from '../hooks/useWebSocketService';
 
 const initialState = {
   username_or_email: undefined,
-  password: undefined,
+  password: undefined
 };
 
 const Login: React.FC = () => {
@@ -31,7 +32,8 @@ const Login: React.FC = () => {
     initialState
   );
   const [loading, setLoading] = React.useState(false);
-  const { service } = React.useContext(SitesContext);
+  const { activeSite } = React.useContext(SitesContext);
+  const service = useWebSocketService({ activeSite, loading: false });
   const { setJwt } = React.useContext(AuthContext);
 
   const parseMessage = (msg: WebSocketJsonResponse) => {
@@ -55,7 +57,7 @@ const Login: React.FC = () => {
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
-      .subscribe(parseMessage, console.error, () => console.log("complete"));
+      .subscribe(parseMessage, console.error, () => console.log('complete'));
 
     return () => {
       subscription?.unsubscribe();
@@ -70,25 +72,25 @@ const Login: React.FC = () => {
 
   return (
     <SafeAreaView style={authStyles.container}>
-      <Text style={authStyles.header}>{i18n.t("login")}</Text>
+      <Text style={authStyles.header}>{i18n.t('login')}</Text>
       <View style={authStyles.inputContainer}>
-        <Text style={authStyles.label}>{i18n.t("email")}</Text>
+        <Text style={authStyles.label}>{i18n.t('email')}</Text>
         <TextInput
           style={authStyles.input}
-          placeholder="john@doe.com"
+          placeholder='john@doe.com'
           placeholderTextColor={colors.gray}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          keyboardType='email-address'
+          autoCapitalize='none'
           onChangeText={(usernameOrEmail) =>
             setState({ username_or_email: usernameOrEmail })
           }
         />
       </View>
       <View style={authStyles.inputContainer}>
-        <Text style={authStyles.label}>{i18n.t("password")}</Text>
+        <Text style={authStyles.label}>{i18n.t('password')}</Text>
         <TextInput
           style={authStyles.input}
-          placeholder="password"
+          placeholder='password'
           secureTextEntry
           placeholderTextColor={colors.gray}
           onChangeText={(password) => setState({ password })}
@@ -102,7 +104,7 @@ const Login: React.FC = () => {
         {loading ? (
           <ActivityIndicator />
         ) : (
-          <Text style={authStyles.buttonText}>{i18n.t("login")}</Text>
+          <Text style={authStyles.buttonText}>{i18n.t('login')}</Text>
         )}
       </TouchableOpacity>
     </SafeAreaView>
