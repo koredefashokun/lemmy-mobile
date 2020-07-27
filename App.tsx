@@ -52,6 +52,9 @@ const SiteNavigator = () => (
           <Feather name='menu' color='#DEDEDE' size={28} />
         </TouchableOpacity>
       ),
+      headerLeftContainerStyle: {
+        paddingLeft: 20
+      },
       headerTitleStyle: {
         color: '#DEDEDE'
       }

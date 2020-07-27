@@ -55,9 +55,10 @@ const PostListing: React.FC<PostListingProps> = (props) => {
     my_vote: props.post.my_vote,
     score: props.post.score,
     upvotes: props.post.upvotes,
-    downvotes: props.post.downvotes,
+    downvotes: props.post.downvotes
   };
 
+  // TODO: Implement upvote/downvote logic.
   const [state, setState] = React.useReducer(
     (p: any, n: any) => ({ ...p, ...n }),
     initialState
@@ -89,7 +90,7 @@ const PostListing: React.FC<PostListingProps> = (props) => {
             fontSize: 18,
             fontWeight: '500',
             marginTop: 5,
-            color: '#DEDEDE',
+            color: '#DEDEDE'
           }}
         >
           {props.post.name}

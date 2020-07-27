@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, ScrollView, ActivityIndicator } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   CommentNode as CommentNodeI,
@@ -279,6 +279,8 @@ const Post: React.FC = () => {
     }
   };
 
+  const navigation = useNavigation();
+
   React.useEffect(() => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
@@ -294,10 +296,18 @@ const Post: React.FC = () => {
     };
   }, []);
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: state.post ? state.post.name : <ActivityIndicator />
+    });
+  }, [navigation, state.post]);
+
   return (
     <View style={{ flex: 1, backgroundColor: '#222222' }}>
       {state.loading ? (
-        <ActivityIndicator />
+        <View style={{ marginTop: 20 }}>
+          <ActivityIndicator />
+        </View>
       ) : (
         <ScrollView>
           <PostListing
