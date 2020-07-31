@@ -60,7 +60,7 @@ export const SitesProvider: React.FC = ({ children }) => {
 
   React.useEffect(() => {
     (async () => {
-      await Promise.all([loadActiveSite, loadSites]);
+      await Promise.all([loadActiveSite(), loadSites()]);
       setLoading(false);
     })();
   }, []);
@@ -77,7 +77,14 @@ export const SitesProvider: React.FC = ({ children }) => {
     AsyncStorage.setItem('sites', JSON.stringify(sites));
   }, [sites]);
 
-  const addSite = (site: Site) => setSites([...sites, site]);
+  React.useEffect(() => {
+    console.log('activeSite changed: ', activeSite);
+  }, [activeSite]);
+
+  const addSite = (site: Site) => {
+    setSites([...sites, site]);
+    setActiveSite(site);
+  };
 
   const removeSite = (wsUri: string) => {
     setSites(sites.filter((site) => site.wsUri !== wsUri));

@@ -38,32 +38,34 @@ export type SiteStackParamList = {
 
 const SiteNavigator = () => (
   <SiteStack.Navigator
-    screenOptions={({ navigation }) => ({
+    screenOptions={{
       headerStyle: {
         backgroundColor: '#222222',
         shadowColor: '#999999'
       },
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('SiteSelector');
-          }}
-        >
-          <Feather name='menu' color='#DEDEDE' size={28} />
-        </TouchableOpacity>
-      ),
       headerLeftContainerStyle: {
-        paddingLeft: 20
+        paddingLeft: 12
       },
       headerTitleStyle: {
         color: '#DEDEDE'
       }
-    })}
+    }}
   >
     <SiteStack.Screen
       name='Home'
       component={Home}
-      options={{ headerTitle: '' }}
+      options={({ navigation }) => ({
+        headerTitle: '',
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('SiteSelector');
+            }}
+          >
+            <Feather name='menu' color='#DEDEDE' size={28} />
+          </TouchableOpacity>
+        )
+      })}
     />
     <SiteStack.Screen
       name='Post'
