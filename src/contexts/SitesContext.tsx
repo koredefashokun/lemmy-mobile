@@ -66,6 +66,7 @@ export const SitesProvider: React.FC = ({ children }) => {
   }, []);
 
   React.useEffect(() => {
+    if (loading) return;
     if (activeSite) {
       AsyncStorage.setItem('activeSite', JSON.stringify(activeSite));
     } else {
@@ -76,10 +77,6 @@ export const SitesProvider: React.FC = ({ children }) => {
   React.useEffect(() => {
     AsyncStorage.setItem('sites', JSON.stringify(sites));
   }, [sites]);
-
-  React.useEffect(() => {
-    console.log('activeSite changed: ', activeSite);
-  }, [activeSite]);
 
   const addSite = (site: Site) => {
     setSites([...sites, site]);

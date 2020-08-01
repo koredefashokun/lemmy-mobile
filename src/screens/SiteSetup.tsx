@@ -9,14 +9,13 @@ import { colors } from '../styles/theme';
 // TODO: Move all the copy for this component into the translation files.
 const SiteSetup: React.FC = () => {
   const [siteUrl, setSiteUrl] = React.useState('');
-  const { addSite, setActiveSite } = React.useContext(SitesContext);
+  const { addSite } = React.useContext(SitesContext);
   const { navigate } = useNavigation();
 
   const handleSubmit = () => {
     // TODO: Make this get the actual name of the site (preferrably without a request to the site's server).
     // If getting the site's name is not possible without setting the site as the active site, this might have to become async.
     addSite({ wsUri: siteUrl, name: 'Lemmy' });
-    setActiveSite({ wsUri: siteUrl, name: 'Lemmy' });
     navigate('Site');
   };
 
