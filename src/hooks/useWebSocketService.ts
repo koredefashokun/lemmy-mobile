@@ -70,7 +70,7 @@ const useWebSocketService = ({
 
   const wsSendWrapper = (op: UserOperation, data: MessageType) => {
     let send = { op: UserOperation[op], data };
-    console.log(send);
+    // console.log(send);
     return JSON.stringify(send);
   };
 

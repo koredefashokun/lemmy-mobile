@@ -1,7 +1,7 @@
 import React from 'react';
 import { Post, SortType } from '../interfaces';
 import { postSort } from '../utils';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { i18n } from '../i18next';
 import PostListing from './PostListing';
 
@@ -12,6 +12,8 @@ interface PostListingsProps {
   sort?: SortType;
   enableDownvotes: boolean;
   enableNsfw: boolean;
+  fetchingMore: boolean;
+  loadMore(): void;
 }
 
 const PostListings: React.FC<PostListingsProps> = (props) => {
@@ -86,9 +88,13 @@ const PostListings: React.FC<PostListingsProps> = (props) => {
           showsVerticalScrollIndicator={false}
           data={outer()}
           keyExtractor={(p) => p.id.toString()}
+          onEndReached={props.loadMore}
+          onEndReachedThreshold={0.1}
+          ListFooterComponent={
+            props.fetchingMore ? <ActivityIndicator /> : undefined
+          }
           renderItem={({ item }) => (
             <PostListing
-              key={item.id}
               post={item}
               showCommunity={props.showCommunity}
               enableDownvotes={props.enableDownvotes}

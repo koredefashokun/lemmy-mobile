@@ -40,7 +40,7 @@ import {
   // SearchForm,
   // SearchResponse,
   CommentResponse,
-  PostResponse,
+  PostResponse
 } from './interfaces';
 // import { UserService } from './services';
 
@@ -86,7 +86,7 @@ export const languages = [
   { code: 'uk', name: 'Українська Mова' },
   { code: 'ru', name: 'Русский' },
   { code: 'nl', name: 'Nederlands' },
-  { code: 'it', name: 'Italiano' },
+  { code: 'it', name: 'Italiano' }
 ];
 
 export const themes = [
@@ -102,7 +102,7 @@ export const themes = [
   'vaporwave',
   'vaporwave-dark',
   'i386',
-  'litely',
+  'litely'
 ];
 
 const DEFAULT_ALPHABET =
@@ -190,7 +190,7 @@ export function hotRank(score: number, timeStr: string): number {
 //   return { __html: md.render(text) };
 // }
 
-export function getUnixTime(text: string): number {
+export function getUnixTime(text: string) {
   return text ? new Date(text).getTime() / 1000 : undefined;
 }
 
@@ -233,13 +233,9 @@ const imageRegex = new RegExp(
 );
 const videoRegex = new RegExp(`(http)?s?:?(\/\/[^"']*\.(?:mp4))`);
 
-export function isImage(url: string) {
-  return imageRegex.test(url);
-}
+export const isImage = (url: string) => imageRegex.test(url);
 
-export function isVideo(url: string) {
-  return videoRegex.test(url);
-}
+export const isVideo = (url: string) => videoRegex.test(url);
 
 export function validURL(str: string) {
   try {
@@ -254,7 +250,7 @@ export function validEmail(email: string) {
   return re.test(String(email).toLowerCase());
 }
 
-export function capitalizeFirstLetter(str: string): string {
+export function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
@@ -637,7 +633,7 @@ export function getDataTypeFromProps(props: any): DataType {
 //     : SortType.Hot;
 // }
 
-export function getPageFromProps(props: any): number {
+export function getPageFromProps(props: any) {
   return 1;
   // return props.match.params.page ? Number(props.match.params.page) : 1;
 }
@@ -666,31 +662,25 @@ export function saveCommentRes(
   comments: Array<Comment>
 ) {
   let found = comments.find((c) => c.id == data.comment.id);
-  if (found) {
-    found.saved = data.comment.saved;
-  }
+  if (found) found.saved = data.comment.saved;
 }
 
 export function createCommentLikeRes(
   data: CommentResponse,
   comments: Array<Comment>
 ) {
-  let found: Comment = comments.find((c) => c.id === data.comment.id);
+  let found = comments.find((c) => c.id === data.comment.id);
   if (found) {
     found.score = data.comment.score;
     found.upvotes = data.comment.upvotes;
     found.downvotes = data.comment.downvotes;
-    if (data.comment.my_vote !== null) {
-      found.my_vote = data.comment.my_vote;
-    }
+    if (data.comment.my_vote !== null) found.my_vote = data.comment.my_vote;
   }
 }
 
 export function createPostLikeFindRes(data: PostResponse, posts: Array<Post>) {
   let found = posts.find((c) => c.id == data.post.id);
-  if (found) {
-    createPostLikeRes(data, found);
-  }
+  if (found) createPostLikeRes(data, found);
 }
 
 export function createPostLikeRes(data: PostResponse, post: Post) {
@@ -698,17 +688,13 @@ export function createPostLikeRes(data: PostResponse, post: Post) {
     post.score = data.post.score;
     post.upvotes = data.post.upvotes;
     post.downvotes = data.post.downvotes;
-    if (data.post.my_vote !== null) {
-      post.my_vote = data.post.my_vote;
-    }
+    if (data.post.my_vote !== null) post.my_vote = data.post.my_vote;
   }
 }
 
 export function editPostFindRes(data: PostResponse, posts: Array<Post>) {
   let found = posts.find((c) => c.id == data.post.id);
-  if (found) {
-    editPostRes(data, found);
-  }
+  if (found) editPostRes(data, found);
 }
 
 export function editPostRes(data: PostResponse, post: Post) {
@@ -836,7 +822,7 @@ export const colorList: Array<string> = [
   hsl(150),
   hsl(200),
   hsl(250),
-  hsl(300),
+  hsl(300)
 ];
 
 function hsl(num: number) {
@@ -847,7 +833,7 @@ function hsl(num: number) {
 //   return `hsla(${Math.random() * 360}, 100%, 50%, 1)`;
 // }
 
-export function previewLines(text: string, lines: number = 3): string {
+export function previewLines(text: string, lines: number = 3) {
   // Use lines * 2 because markdown requires 2 lines
   return text
     .split('\n')
@@ -855,7 +841,7 @@ export function previewLines(text: string, lines: number = 3): string {
     .join('\n');
 }
 
-export function hostname(url: string): string {
+export function hostname(url: string) {
   let cUrl = new URL(url);
   return window.location.port
     ? `${cUrl.hostname}:${cUrl.port}`

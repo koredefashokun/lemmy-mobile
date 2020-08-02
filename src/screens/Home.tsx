@@ -1,13 +1,9 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 import { retryWhen, delay, take } from 'rxjs/operators';
 import {
   wsJsonToRes,
   editPostFindRes,
   createPostLikeFindRes,
-  getDataTypeFromProps,
-  getPageFromProps,
   fetchLimit,
   commentsToFlatNodes
 } from '../utils';
@@ -35,8 +31,6 @@ import {
 import CommentNodes from '../components/CommentNodes';
 import PostListings from '../components/PostListings';
 import { SitesContext } from '../contexts/SitesContext';
-import { useNavigation } from '@react-navigation/native';
-import { colors } from '../styles/theme';
 import { AuthContext } from '../contexts/AuthContext';
 import useWebSocketService from '../hooks/useWebSocketService';
 
@@ -46,6 +40,7 @@ interface MainState {
   siteRes: GetSiteResponse;
   showEditSite: boolean;
   loading: boolean;
+  fetchingMore: boolean;
   posts: Array<Post>;
   comments: Array<Comment>;
   listingType: ListingType;
@@ -54,7 +49,7 @@ interface MainState {
   page: number;
 }
 
-const Home: React.FC = (props) => {
+const Home: React.FC = () => {
   const initialState: MainState = {
     subscribedCommunities: [],
     trendingCommunities: [],
@@ -72,27 +67,33 @@ const Home: React.FC = (props) => {
         enable_downvotes: null,
         open_registration: null,
         enable_nsfw: null
-      },
+      } as any,
       admins: [],
       banned: [],
-      online: null
+      online: null as any
     },
     showEditSite: false,
     loading: true,
+    fetchingMore: false,
     posts: [],
     comments: [],
     listingType: ListingType.All,
-    dataType: getDataTypeFromProps(props),
+    dataType: DataType.Post,
     sort: SortType.TopAll,
-    page: getPageFromProps(props)
+    page: 1
   };
 
   const [state, setState] = React.useReducer(
-    (p: typeof initialState, n: typeof initialState) => ({ ...p, ...n }),
+    (p: any, n: any) => ({
+      ...p,
+      ...n,
+      ...(n.posts ? { posts: [...p.posts, ...n.posts] } : {})
+    }),
     initialState
   );
 
   const { activeSite } = React.useContext(SitesContext);
+  // @ts-ignore
   const service = useWebSocketService({ activeSite, loading: false });
   const { user } = React.useContext(AuthContext);
 
@@ -100,7 +101,6 @@ const Home: React.FC = (props) => {
     const subscription = service?.subject
       .pipe(retryWhen((errors) => errors.pipe(delay(3000), take(10))))
       .subscribe(parseMessage, console.error, () => console.log('complete'));
-
     service?.getFollowedCommunities();
     fetchData();
 
@@ -108,6 +108,10 @@ const Home: React.FC = (props) => {
       subscription?.unsubscribe();
     };
   }, []);
+
+  React.useEffect(() => {
+    console.log(state.posts.length);
+  }, [state.posts]);
 
   const fetchData = () => {
     if (state.dataType === DataType.Post) {
@@ -129,6 +133,14 @@ const Home: React.FC = (props) => {
     }
   };
 
+  const handleLoadMore = () => {
+    setState({ fetchingMore: true, page: state.page + 1 });
+  };
+
+  React.useEffect(() => {
+    if (state.page > 1) fetchData();
+  }, [state.page]);
+
   const parseMessage = (msg: WebSocketJsonResponse) => {
     let res = wsJsonToRes(msg);
     if (msg.error) {
@@ -138,12 +150,10 @@ const Home: React.FC = (props) => {
       fetchData();
     } else if (res.op === UserOperation.GetFollowedCommunities) {
       let data = res.data as GetFollowedCommunitiesResponse;
-      state.subscribedCommunities = data.communities;
-      setState(state);
+      setState({ subscribedCommunities: data.communities });
     } else if (res.op === UserOperation.ListCommunities) {
       let data = res.data as ListCommunitiesResponse;
-      state.trendingCommunities = data.communities;
-      setState(state);
+      setState({ trendingCommunities: data.communities });
     } else if (res.op === UserOperation.GetSite) {
       let data = res.data as GetSiteResponse;
 
@@ -151,23 +161,28 @@ const Home: React.FC = (props) => {
       if (!data.site) {
         // context.router.history.push('/setup');
       }
-      state.siteRes.admins = data.admins;
-      state.siteRes.site = data.site;
-      state.siteRes.banned = data.banned;
-      state.siteRes.online = data.online;
-      setState(state);
-      document.title = `${state.siteRes.site.name}`;
+      setState({
+        siteRes: {
+          ...state.siteRes,
+          admins: data.admins,
+          site: data.site,
+          banned: data.banned,
+          online: data.online
+        }
+      });
+      // document.title = `${state.siteRes.site.name}`;
     } else if (res.op === UserOperation.EditSite) {
       let data = res.data as SiteResponse;
-      state.siteRes.site = data.site;
-      state.showEditSite = false;
-      setState(state);
+      setState({
+        siteRes: { ...state.siteRes, site: data.site, showEditSite: false }
+      });
       // toast(i18n.t('site_saved'));
     } else if (res.op === UserOperation.GetPosts) {
       let data = res.data as GetPostsResponse;
-      state.posts = data.posts;
-      state.loading = false;
-      setState(state);
+
+      // For some reason, state.posts seems to be empty at this point.
+      // And logging state changes does not show why/when this happens.
+      setState({ fetchingMore: false, posts: data.posts });
       // setupTippy();
     } else if (res.op === UserOperation.CreatePost) {
       let data = res.data as PostResponse;
@@ -176,7 +191,7 @@ const Home: React.FC = (props) => {
       if (state.listingType === ListingType.Subscribed) {
         if (
           state.subscribedCommunities
-            .map((c) => c.community_id)
+            .map((c: any) => c.community_id)
             .includes(data.post.community_id)
         ) {
           state.posts.unshift(data.post);
@@ -201,16 +216,15 @@ const Home: React.FC = (props) => {
       setState(state);
     } else if (res.op === UserOperation.AddAdmin) {
       let data = res.data as AddAdminResponse;
-      state.siteRes.admins = data.admins;
-      setState(state);
+      setState({ siteRes: { ...state.siteRes, admins: data.admins } });
     } else if (res.op === UserOperation.BanUser) {
       let data = res.data as BanUserResponse;
-      let found = state.siteRes.banned.find((u) => (u.id = data.user.id));
+      let found = state.siteRes.banned.find((u: any) => (u.id = data.user.id));
 
       // Remove the banned if its found in the list, and the action is an unban
       if (found && !data.banned) {
         state.siteRes.banned = state.siteRes.banned.filter(
-          (i) => i.id !== data.user.id
+          (i: any) => i.id !== data.user.id
         );
       } else {
         state.siteRes.banned.push(data.user);
@@ -226,10 +240,12 @@ const Home: React.FC = (props) => {
       sort={state.sort}
       enableDownvotes={state.siteRes.site.enable_downvotes}
       enableNsfw={state.siteRes.site.enable_nsfw}
+      fetchingMore={state.fetchingMore}
+      loadMore={handleLoadMore}
     />
   ) : (
     <CommentNodes
-      nodes={commentsToFlatNodes(state.comments)}
+      nodes={commentsToFlatNodes(state.comments as any)}
       noIndent
       showCommunity
       sortType={state.sort}
