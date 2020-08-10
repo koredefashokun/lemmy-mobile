@@ -88,12 +88,12 @@ const PostListing: React.FC<PostListingProps> = (props) => {
     // this.context.router.history.push(`/login`);
     // }
 
-    const new_vote = state.my_vote == 1 ? 0 : 1;
+    const new_vote = state.my_vote === 1 ? 0 : 1;
 
-    if (state.my_vote == 1) {
+    if (state.my_vote === 1) {
       state.score--;
       state.upvotes--;
-    } else if (state.my_vote == -1) {
+    } else if (state.my_vote === -1) {
       state.downvotes--;
       state.upvotes++;
       state.score += 2;
@@ -111,7 +111,6 @@ const PostListing: React.FC<PostListingProps> = (props) => {
 
     service?.likePost(form);
     setState(state);
-    // setupTippy();
   };
 
   const handlePostDislike = () => {
@@ -122,13 +121,13 @@ const PostListing: React.FC<PostListingProps> = (props) => {
     //   this.context.router.history.push(`/login`);
     // }
 
-    const new_vote = state.my_vote == -1 ? 0 : -1;
+    const new_vote = state.my_vote === -1 ? 0 : -1;
 
-    if (state.my_vote == 1) {
+    if (state.my_vote === 1) {
       state.score -= 2;
       state.upvotes--;
       state.downvotes++;
-    } else if (state.my_vote == -1) {
+    } else if (state.my_vote === -1) {
       state.downvotes--;
       state.score++;
     } else {
@@ -145,7 +144,6 @@ const PostListing: React.FC<PostListingProps> = (props) => {
 
     service?.likePost(form);
     setState(state);
-    // setupTippy();
   };
 
   // Remove wrapping TouchableOpacity to make upvote/downvote buttons clickable
