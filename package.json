@@ -20,7 +20,7 @@
     "expo-status-bar": "^1.0.2",
     "i18next": "^19.5.4",
     "jwt-decode": "^2.2.0",
-    "markdown-it": "^11.0.0",
+    "markdown-it": "^12.3.2",
     "markdown-it-container": "^3.0.0",
     "markdown-it-emoji": "^1.4.0",
     "moment": "^2.27.0",
