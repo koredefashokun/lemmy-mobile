@@ -23,7 +23,7 @@
     "markdown-it": "^11.0.0",
     "markdown-it-container": "^3.0.0",
     "markdown-it-emoji": "^1.4.0",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "punycode": "^2.1.1",
     "react": "~16.11.0",
     "react-dom": "~16.11.0",
